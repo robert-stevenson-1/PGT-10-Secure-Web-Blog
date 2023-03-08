@@ -1,0 +1,70 @@
+h1 {
+
+}
+
+.nav {
+    margin: 5px 0px;
+	padding: 5px 10px;
+	text-align: center;
+	background-color: #b1e4eb;
+	border:solid;
+    border-width: 1px;
+    overflow: auto;
+}
+
+.nav-button nav{
+    color: #000000;
+    border-radius: 1px;
+    padding: 5px 10px;
+    font-size: 14px;
+    font-weight: bold;
+    text-transform: uppercase;
+    text-decoration: none;
+    outline: none;
+    cursor: pointer;    
+}
+
+.nav-search .nav{
+    background-color: #60cedd;
+}
+
+.left-aligned{
+    float: left;
+    align-self: center;
+    align-content: center;;
+
+}
+
+.right-aligned{
+    float: right;
+    align-self: center;
+    align-content: center;;
+
+}
+
+.container-center {
+    text-align: center;
+    margin-top: 50px;
+    margin-bottom: 50px;
+    margin-left: auto;
+    margin-right: auto;
+    align-content: center;
+    align-items: center;
+
+}
+
+.container-posts{
+    margin-top: 50px;
+    margin-bottom: 50px;
+    margin-left: auto;
+    margin-right: auto;
+    align-content: center;
+}
+
+.post{
+    margin-top: 50px;
+    margin-bottom: 50px;
+    margin-left: auto;
+    margin-right: auto;
+    te
+}
