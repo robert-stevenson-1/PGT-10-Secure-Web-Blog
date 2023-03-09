@@ -25,24 +25,27 @@ TODO:
 */
 
 //Linking PostgreSQL database with Express in Node.js doc source:
-https://blog.logrocket.com/crud-rest-api-node-js-express-postgresql/
+//  https://blog.logrocket.com/crud-rest-api-node-js-express-postgresql/
 
 const express = require('express'); // import express module
 const bodyParser = require('body-parser'); // import body-parser
 const pg = require('pg'); // import the postgresql module
+const path = require('path'); // import the path module
 
+const config = require('./config.js'); // import the config file
 
-const port = process.env.PORT || 3000; // set the port
-const DB_PORT = process.env.DB_PORT || 5432; // set the database port
-//TODO: Update the database url to point to your database
-const DATABASE_URL = process.env.DATABASE_URL || ''; // set the database url
+const port = config.site.port; // set the port
+
+console.log(path.join(__dirname, config.site.path));
 
 const app = express(); // create express app
+
+app.use(express.static(path.join(__dirname, config.site.path))); // set the static folder
 app.use(bodyParser.json()); // parse application/json
 
 //Link PostgreSQL database with Express in Node.js
-const client = new pg.Client(DATABASE_URL); // create a client to the database
-client.connect(); // connect to the database
+const pool = new pg.Pool(config.database); // create a new postgresql pool
+const client = pool.connect(); // create and connect a client to the database
 
 /*
 source: https://blog.logrocket.com/crud-rest-api-node-js-express-postgresql/
@@ -58,12 +61,12 @@ Delete: Use the DELETE method to remove a resource from the system
 */ 
 
 //app GET method to read a resource, retrieving data without altering it
-app.get('/', (req, res) => {
+app.get('/hello', (req, res) => {
   res.send('GET Hello World!');
 });
 
 //app POST method to create a resource in a REST environment
-app.post('/a', (req, res) => {
+app.post('/post', (req, res) => {
   res.send('POST hello world!');
   
   // template POST method content:
@@ -81,11 +84,11 @@ app.post('/a', (req, res) => {
 });
 
 //app PUT method to update a resource
-app.put('/b', (req, res) => {
+app.put('/put', (req, res) => {
   res.send('PUT hello world!');
 });
 
 //app list method to list all resources in a REST environment
 app.listen(port, () => {
-  console.log('Example app listening on port ${port}!');
+  console.log('listening on port ' + port);
 });
