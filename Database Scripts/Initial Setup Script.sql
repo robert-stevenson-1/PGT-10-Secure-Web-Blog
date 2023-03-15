@@ -18,13 +18,6 @@ CREATE TABLE posts (
   FOREIGN KEY (account_id) REFERENCES accounts (ID)
 );
 
-INSERT INTO posts (account_id, title, content) VALUES
-  (1, 'My first post', 'This is the content of my first post.'),
-  (1, 'My second post', 'This is the content of my second post.'),
-  (2, 'Why I love programming', 'Programming has always been a passion of mine. Here are some reasons why...'),
-  (3, 'The benefits of exercise', 'Exercise is not only good for your physical health, but also your mental wellbeing.'),
-  (4, 'My travel adventures', 'I''ve been lucky enough to visit some amazing places. Here are some of my favorite travel experiences.');
-
 --load some fake account data
 INSERT INTO accounts (username, password, email) VALUES
   ('johndoe', 'password123', 'johndoe@example.com'),
@@ -33,3 +26,10 @@ INSERT INTO accounts (username, password, email) VALUES
   ('maryjones', 'letmein', 'maryjones@example.com'),
   ('samjohnson', 'password1234', 'samjohnson@example.com');
 -- 'ID' and 'created_at' will be automatically filled when inserted
+
+INSERT INTO posts (account_id, title, content) VALUES
+  (1, 'My first post', 'This is the content of my first post.'),
+  (1, 'My second post', 'This is the content of my second post.'),
+  (2, 'Why I love programming', 'Programming has always been a passion of mine. Here are some reasons why...'),
+  (3, 'The benefits of exercise', 'Exercise is not only good for your physical health, but also your mental wellbeing.'),
+  (4, 'My travel adventures', 'I''ve been lucky enough to visit some amazing places. Here are some of my favorite travel experiences.');
