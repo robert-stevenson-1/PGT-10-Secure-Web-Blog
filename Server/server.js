@@ -8,9 +8,6 @@ install links for requires software and tools:
 
 /*
 TODO:
-- Connect to the database
-- Create the database tables
-
 - Implement the CRUD operations
 - Allow reading from the database
 - Allow writing to the database
@@ -68,19 +65,6 @@ app.get('/hello', (req, res) => {
 //app POST method to create a resource in a REST environment
 app.post('/post', (req, res) => {
   res.send('POST hello world!');
-  
-  // template POST method content:
-
-  // const { title, body } = req.body;
-  // const sql_query = 'INSERT INTO posts (title, body) VALUES ($1, $2) RETURNING *';
-  // const values = [title, body];
-  // client.query(sql, values)
-  // .then((result) => {
-  //     res.json(result.rows[0]);
-  //   })
-  // .catch((err) => {
-  //     res.status(500).json(err);
-  //   });
 });
 
 //app PUT method to update a resource
