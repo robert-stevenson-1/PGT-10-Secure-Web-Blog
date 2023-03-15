@@ -31,3 +31,13 @@ You can use pre-built security libraries, but you must clearly and concisely exp
 **There are, however, more marks available for coding your own security processes/algorithms.**
 
 Each mitigation must remain valid throughout the website, e.g., you cannot mitigate SQL injection and then break it later when mitigating another vulnerability.
+
+## Software/Tools Required:
+- [node.js](https://nodejs.org/en/download/)
+- [npm](https://www.npmjs.com/package/npm)
+    - #### Modules:
+        - [Express](https://expressjs.com/)
+        - [body-parser](https://www.npmjs.com/package/body-parser)
+        - [pg (PostgreSQL DB Module)](https://www.npmjs.com/package/pg)
+- [PostgreSQL](https://www.postgresql.org/download/)
+- [PostgreSQL (alt download)](https://www.enterprisedb.com/postgresql-tutorial-resources-training?uuid=4726a163-a071-4af4-8395-6d239c34d4a1&campaignId=7012J000001h3GiQAI)
