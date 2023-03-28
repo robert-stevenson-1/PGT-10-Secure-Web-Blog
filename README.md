@@ -32,6 +32,11 @@ You can use pre-built security libraries, but you must clearly and concisely exp
 
 Each mitigation must remain valid throughout the website, e.g., you cannot mitigate SQL injection and then break it later when mitigating another vulnerability.
 
+## Repo Setup Guides and Resources
+
+### Creating a local version of the Database used by the site:
+<iframe width="560" height="315" src="https://www.youtube.com/embed/WwcUuguOZlw" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+
 ## Software/Tools Required:
 - [node.js](https://nodejs.org/en/download/)
 - [npm](https://www.npmjs.com/package/npm)
