@@ -1,15 +1,17 @@
-// TODO: Make this function below more specific to its use case
-// on index.html load, request the posts form the server
-window.onload = function() {
+window.onload = onload()
+
+function onload() {
     console.log('Page loaded');
-    const response = fetch('/',
+    // make a GET request for the post in the database on the server
+    fetch('/get_posts',
     {
         method: 'GET',
-    }).then(()=>{
-        console.log('Response: ' + response.text)
-
-        // add the response to the DOM
-        document.getElementById('Posts').append(response.text)
+    }).then(function(response){ //with the response....
+        return response.json() // return the JSON of the response
     })
-
+    .then(function(data) { //with the JSON response data
+        console.log(data)
+        //TODO: process the response data (Posts) into HTML elements that can be added to our website
+    })
+    .catch(error => console.error(error)); // catch any error and print it out
 }

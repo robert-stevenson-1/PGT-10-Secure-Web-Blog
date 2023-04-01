@@ -82,19 +82,22 @@ app.listen(port, () => {
 });
 
 //get the posts for the database and display them on the main page of the site
-app.get('/', (req, res) => {
+app.get('/get_posts', (req, res) => {
   console.log('Getting posts for database and sending them to be displayed');
   
-  user = "CataLover231"
-  datePost = "22/03/2023"
-  postBody = "Here is my blog post. Look forwards to more."
-  postTitle = "My first post"
-  
   //TODO: read from the database
-  // TODO: create post for each post read from the database
   
-  postToAdd = templates.generatePostTemplate(postTitle, postBody, user, postDate)
+  // TODO: add the post info for each post read from the database to the JSON to return  
+  //create a JSON object with the posts info ready to send to the frontend as a response for processing and displaying them
+  const postToAdd = { //TEST DATA   
+    1 : { //post 1
+      user : "CataLover231",
+      postTitle : "My first post",
+      postBody : "Here is my blog post. Look forwards to more.",
+      datePost : "22/03/2023",
+    },
+  };
   
-  // added the post to the site and display it on the main page in the post container
-  res.send(postToAdd);
+  // send the posts to add to the site in the post container
+  res.json(postToAdd);
 });
