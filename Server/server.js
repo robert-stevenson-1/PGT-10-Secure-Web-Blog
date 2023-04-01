@@ -24,12 +24,16 @@ TODO:
 //Linking PostgreSQL database with Express in Node.js doc source:
 //  https://blog.logrocket.com/crud-rest-api-node-js-express-postgresql/
 
+
+
 const express = require('express'); // import express module
 const bodyParser = require('body-parser'); // import body-parser
 const pg = require('pg'); // import the postgresql module
 const path = require('path'); // import the path module
 
 const config = require('./config.js'); // import the config file
+// import the functions for html templates generators for our site
+const templates = require('./templates.js');
 
 const port = config.site.port; // set the port
 
@@ -75,4 +79,22 @@ app.put('/put', (req, res) => {
 //app list method to list all resources in a REST environment
 app.listen(port, () => {
   console.log('listening on port ' + port);
+});
+
+//get the posts for the database and display them on the main page of the site
+app.get('/', (req, res) => {
+  console.log('Getting posts for database and sending them to be displayed');
+  
+  user = "CataLover231"
+  datePost = "22/03/2023"
+  postBody = "Here is my blog post. Look forwards to more."
+  postTitle = "My first post"
+  
+  //TODO: read from the database
+  // TODO: create post for each post read from the database
+  
+  postToAdd = templates.generatePostTemplate(postTitle, postBody, user, postDate)
+  
+  // added the post to the site and display it on the main page in the post container
+  res.send(postToAdd);
 });
