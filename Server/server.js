@@ -33,7 +33,7 @@ const path = require('path'); // import the path module
 
 const config = require('./config.js'); // import the config file
 // import the functions for html templates generators for our site
-const templates = require('./templates.js');
+// const templates = require('../Our Modules/templates.js');
 
 const port = config.site.port; // set the port
 
@@ -90,12 +90,14 @@ app.get('/get_posts', (req, res) => {
   // TODO: add the post info for each post read from the database to the JSON to return  
   //create a JSON object with the posts info ready to send to the frontend as a response for processing and displaying them
   const postToAdd = { //TEST DATA   
-    1 : { //post 1
+    posts: [
+      { //post 1
       user : "CataLover231",
       postTitle : "My first post",
       postBody : "Here is my blog post. Look forwards to more.",
       datePost : "22/03/2023",
     },
+  ]
   };
   
   // send the posts to add to the site in the post container
