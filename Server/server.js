@@ -87,7 +87,7 @@ app.get("/get_posts", async (req, res) => {
   try {
     // make a read request from the database
     db_result = await client.query(DB_Queries.GET_ALL_POSTS);
-    console.log(db_result.rows)
+    // console.log(db_result.rows)
 
     //create a JSON object for posts info to send to the frontend as a response for processing and displaying
     const postToAdd = {
@@ -100,11 +100,14 @@ app.get("/get_posts", async (req, res) => {
     for (var key in db_result.rows) {
       if (db_result.rows.hasOwnProperty(key)) {
         var rowJSON = db_result.rows[key]
+        //convert the SQL timestamp format to dd/mm/yyyy date format
+        tempDate = new Date(rowJSON.created_at).toLocaleDateString('en-GB');
+
         postJSON = {
           user : rowJSON.username,
           postTitle : rowJSON.title,
           postBody : rowJSON.content,
-          datePost : rowJSON.created_at,
+          datePost : tempDate,
         }
         postToAdd.posts.push(postJSON);
       }
