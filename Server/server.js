@@ -81,45 +81,56 @@ app.put("/put", (req, res) => {
 app.get("/get_posts", async (req, res) => {
   // console.log("Getting posts for database and sending them to be displayed");
 
+  // make a read request from the database
+  db_result = await queryDB(DB_Queries.GET_ALL_POSTS);
+
+  //create a JSON object for posts info to send to the frontend as a response for processing and displaying
+  const postToAdd = {
+    //TEST DATA
+    posts: [],
+  };
+
+  // TODO: add each posts info to the JSON to return
+  for (var key in db_result.rows) {
+    if (db_result.rows.hasOwnProperty(key)) {
+      var rowJSON = db_result.rows[key];
+      //convert the SQL timestamp format to dd/mm/yyyy date format
+      tempDate = new Date(rowJSON.created_at).toLocaleDateString("en-GB");
+
+      postJSON = {
+        user: rowJSON.username,
+        postTitle: rowJSON.title,
+        postBody: rowJSON.content,
+        datePost: tempDate,
+      };
+      postToAdd.posts.push(postJSON);
+    }
+  }
+
+  // send the posts to add to the site in the post container
+  res.json(postToAdd);
+});
+
+async function queryDB(query) {
+  data = {}
+
   //create a client to interact with the database
   const client = await pool.connect(); // create and connect a client to the database
+  
   //try to get the data from the database
   try {
     // make a read request from the database
-    db_result = await client.query(DB_Queries.GET_ALL_POSTS);
+    data = await client.query(DB_Queries.GET_ALL_POSTS);
     // console.log(db_result.rows)
-
-    //create a JSON object for posts info to send to the frontend as a response for processing and displaying
-    const postToAdd = {
-      //TEST DATA
-      posts: [
-      ],
-    };
-
-    // TODO: add each posts info to the JSON to return
-    for (var key in db_result.rows) {
-      if (db_result.rows.hasOwnProperty(key)) {
-        var rowJSON = db_result.rows[key]
-        //convert the SQL timestamp format to dd/mm/yyyy date format
-        tempDate = new Date(rowJSON.created_at).toLocaleDateString('en-GB');
-
-        postJSON = {
-          user : rowJSON.username,
-          postTitle : rowJSON.title,
-          postBody : rowJSON.content,
-          datePost : tempDate,
-        }
-        postToAdd.posts.push(postJSON);
-      }
-    }
-
-    // send the posts to add to the site in the post container
-    res.json(postToAdd);
   } finally {
-    client.end((err) => { // source: https://node-postgres.com/apis/client#clientend
-      console.log('client has disconnected')
+    client.end((err) => {
+      // source: https://node-postgres.com/apis/client#clientend
+      console.log("client has disconnected");
       if (err) {
-        console.log('error during disconnection', err.stack)
+        console.log("error during disconnection", err.stack);
       }
-    })
-}});
+    });
+  }
+  
+  return data;
+}
