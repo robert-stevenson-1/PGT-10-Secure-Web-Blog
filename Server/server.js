@@ -24,29 +24,24 @@ TODO:
 //Linking PostgreSQL database with Express in Node.js doc source:
 //  https://blog.logrocket.com/crud-rest-api-node-js-express-postgresql/
 
+// IMPORTS
+const express = require("express"); // import express module
+const bodyParser = require("body-parser"); // import body-parser
+const pg = require("pg"); // import the postgresql module
+const path = require("path"); // import the path module
 
+const DB_Queries = require("./SQL_queries.js"); // import the SQL queries that we will use regularly
+const config = require("./config.js"); // import the config file
 
-const express = require('express'); // import express module
-const bodyParser = require('body-parser'); // import body-parser
-const pg = require('pg'); // import the postgresql module
-const path = require('path'); // import the path module
-
-const config = require('./config.js'); // import the config file
-// import the functions for html templates generators for our site
-// const templates = require('../Our Modules/templates.js');
-
+//setup the express server app
 const port = config.site.port; // set the port
-
-console.log(path.join(__dirname, config.site.path));
-
 const app = express(); // create express app
-
 app.use(express.static(path.join(__dirname, config.site.path))); // set the static folder
 app.use(bodyParser.json()); // parse application/json
 
 //Link PostgreSQL database with Express in Node.js
 const pool = new pg.Pool(config.database); // create a new postgresql pool
-const client = pool.connect(); // create and connect a client to the database
+// const client = pool.connect(); // create and connect a client to the database
 
 /*
 source: https://blog.logrocket.com/crud-rest-api-node-js-express-postgresql/
@@ -59,47 +54,69 @@ Create: Use the HTTP POST method to create a resource in a REST environment
 Read: Use the GET method to read a resource, retrieving data without altering it
 Update: Use the PUT method to update a resource
 Delete: Use the DELETE method to remove a resource from the system
-*/ 
-
-//app GET method to read a resource, retrieving data without altering it
-app.get('/hello', (req, res) => {
-  res.send('GET Hello World!');
-});
-
-//app POST method to create a resource in a REST environment
-app.post('/post', (req, res) => {
-  res.send('POST hello world!');
-});
-
-//app PUT method to update a resource
-app.put('/put', (req, res) => {
-  res.send('PUT hello world!');
-});
+*/
 
 //app list method to list all resources in a REST environment
 app.listen(port, () => {
-  console.log('listening on port ' + port);
+  console.log("listening on port " + port);
+});
+
+//EXAMPLE API Request Methods:
+//app GET method to read a resource, retrieving data without altering it
+app.get("/hello", (req, res) => {
+  res.send("GET Hello World!");
+});
+
+//app POST method to create a resource in a REST environment
+app.post("/post", (req, res) => {
+  res.send("POST hello world!");
+});
+
+//app PUT method to update a resource
+app.put("/put", (req, res) => {
+  res.send("PUT hello world!");
 });
 
 //get the posts for the database and display them on the main page of the site
-app.get('/get_posts', (req, res) => {
-  console.log('Getting posts for database and sending them to be displayed');
-  
-  //TODO: read from the database
-  
-  // TODO: add the post info for each post read from the database to the JSON to return  
-  //create a JSON object with the posts info ready to send to the frontend as a response for processing and displaying them
-  const postToAdd = { //TEST DATA   
-    posts: [
-      { //post 1
-      user : "CataLover231",
-      postTitle : "My first post",
-      postBody : "Here is my blog post. Look forwards to more.",
-      datePost : "22/03/2023",
-    },
-  ]
-  };
-  
-  // send the posts to add to the site in the post container
-  res.json(postToAdd);
-});
+app.get("/get_posts", async (req, res) => {
+  // console.log("Getting posts for database and sending them to be displayed");
+
+  //create a client to interact with the database
+  const client = await pool.connect(); // create and connect a client to the database
+  //try to get the data from the database
+  try {
+    // make a read request from the database
+    db_result = await client.query(DB_Queries.GET_ALL_POSTS);
+    console.log(db_result.rows)
+
+    //create a JSON object for posts info to send to the frontend as a response for processing and displaying
+    const postToAdd = {
+      //TEST DATA
+      posts: [
+      ],
+    };
+
+    // TODO: add each posts info to the JSON to return
+    for (var key in db_result.rows) {
+      if (db_result.rows.hasOwnProperty(key)) {
+        var rowJSON = db_result.rows[key]
+        postJSON = {
+          user : rowJSON.username,
+          postTitle : rowJSON.title,
+          postBody : rowJSON.content,
+          datePost : rowJSON.created_at,
+        }
+        postToAdd.posts.push(postJSON);
+      }
+    }
+
+    // send the posts to add to the site in the post container
+    res.json(postToAdd);
+  } finally {
+    client.end((err) => { // source: https://node-postgres.com/apis/client#clientend
+      console.log('client has disconnected')
+      if (err) {
+        console.log('error during disconnection', err.stack)
+      }
+    })
+}});
