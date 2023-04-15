@@ -1,3 +1,4 @@
+//set the events
 window.onload = onload()
 
 function onload() {
@@ -19,6 +20,7 @@ function processPosts(posts) { //with the JSON response data
     postsContainer = document.getElementById('Posts')
     //TODO: process the response data (Posts) into HTML elements that can be added to our website
     for (var postKey in posts) {
+        console.log(posts[postKey])
         //create a new post element
         postElement = generatePostTemplate(
             posts[postKey].postTitle, 
