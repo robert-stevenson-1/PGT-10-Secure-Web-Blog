@@ -47,7 +47,7 @@ function processPosts(posts) { //with the JSON response data
 }
 
 /**
- * 
+ * function to process the posts from the server and add them to the website
  * @param {string} post_title The title of the post
  * @param {string} post_body The body/content of the post
  * @param {string} post_user The post's user
