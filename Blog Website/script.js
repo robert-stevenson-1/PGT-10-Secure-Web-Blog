@@ -1,6 +1,9 @@
 //set the events
 window.onload = onload()
 
+/**
+ * On the page load, run...
+ */
 function onload() {
     console.log('Page loaded');
 
@@ -21,6 +24,10 @@ function onload() {
     .catch(error => console.error(error)); // catch any error and print it out
 }
 
+/**
+ * Take the post data from the server and process it to display on the webpage
+ * @param {JSON} posts The posts data as JSON that will be processed and added to the webpage
+ */
 function processPosts(posts) { //with the JSON response data
     posts = posts.posts
     //get the posts container from the DOM
@@ -39,6 +46,14 @@ function processPosts(posts) { //with the JSON response data
     }
 }
 
+/**
+ * 
+ * @param {string} post_title The title of the post
+ * @param {string} post_body The body/content of the post
+ * @param {string} post_user The post's user
+ * @param {string} post_date The date that the post was posted (as a string) in the dd/mm/yyyy format
+ * @returns Return the HTML element for displaying the whole post
+ */
 function generatePostTemplate(post_title, post_body, post_user, post_date){
     // create the container of the post
     var div_post_container = document.createElement('div');
@@ -112,6 +127,10 @@ function generatePostTemplate(post_title, post_body, post_user, post_date){
     return div_post_container
 }
 
+/**
+ * Checks is their is a active and valid user session.
+ * @returns True if there is a valid and active, logged in user session, else it returns false.
+ */
 function isLoggedIn() {
     // TODO: check with the server if we are logged in or not
 
@@ -122,6 +141,9 @@ function isLoggedIn() {
     // return false;
 }
 
+/**
+ * added the login and signup nav buttons to the top nav bar of the site if the user isn't logged in
+ */
 function addLoginSignupButtons(){
     // <a href="LoginSignup.html" class="nav-button left-aligned LoginSignup"><i class="">Log in</i></a>
     // <a href="LoginSignup.html" class="nav-button left-aligned LoginSignup"><i class="">Sign Up</i></a>
