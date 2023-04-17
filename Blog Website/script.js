@@ -92,6 +92,7 @@ function generatePostTemplate(post_title, post_body, post_user, post_date){
     div_post_date.textContent = "Date Posted: " + post_date;
     p_post_body.textContent = post_body;
 
+    //TODO: Make sure you only allow edits to the users own posts
     if (isLoggedIn()) {
         // create options for the post if we in a logged in session
         var div_post_option = document.createElement('div');
