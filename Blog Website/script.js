@@ -6,22 +6,26 @@ window.onload = onload()
  */
 function onload() {
     console.log('Page loaded');
-
+    
     if(!isLoggedIn()) {
         addLoginSignupButtons()
     }
-
-    // make a GET request for the post in the database on the server
-    fetch('/get_posts',
-    {
-        method: 'GET',
-    }).then(function(response){ //with the response....
-        console.error("Status: " + response.status);
-        console.error(response);
-        return response.json() // return the JSON of the response
-    })
-    .then(data => processPosts(data))
-    .catch(error => console.error(error)); // catch any error and print it out
+    
+    // check what page we are on
+    if(window.location.href.includes('/Index.html')) { // are we on the index (main) page
+        console.log('Index page loaded');
+        // make a GET request for the post in the database on the server
+        fetch('/get_posts',
+        {
+            method: 'GET',
+        }).then(function(response){ //with the response....
+            console.error("Status: " + response.status);
+            console.error(response);
+            return response.json() // return the JSON of the response
+        })
+        .then(data => processPosts(data))
+        .catch(error => console.error(error)); // catch any error and print it out
+    }
 }
 
 /**
@@ -149,8 +153,6 @@ function addLoginSignupButtons(){
     // <a href="LoginSignup.html" class="nav-button left-aligned LoginSignup"><i class="">Sign Up</i></a>
     main_nav = document.getElementById('nav-main');
     
-    console.log(main_nav);
-
     btn_login = document.createElement('a');
     btn_login_content = document.createElement('i');
     btn_login.appendChild(btn_login_content);
