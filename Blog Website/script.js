@@ -12,7 +12,7 @@ function onload() {
     }
     
     // check what page we are on
-    if(window.location.href.includes('/Index.html')) { // are we on the index (main) page
+    if(window.location.href.includes('/index.html')) { // are we on the index (main) page
         console.log('Index page loaded');
         // make a GET request for the post in the database on the server
         fetch('/get_posts',
