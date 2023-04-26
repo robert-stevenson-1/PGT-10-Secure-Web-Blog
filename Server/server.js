@@ -9,10 +9,6 @@ install links for requires software and tools:
 /*
 TODO:
 - Implement the CRUD operations
-- Allow reading from the database
-- Allow writing to the database
-- Allow deleting from the database
-- Allow searching in the database
 
 - Implement protection against SQL injection
 - Implement protection from Account Enumeration
@@ -58,23 +54,14 @@ Delete: Use the DELETE method to remove a resource from the system
 
 //app list method to list all resources in a REST environment
 app.listen(port, () => {
-  console.log("listening on port " + port);
+  console.log("Server listening and started at http://localhost:" + port);
 });
 
-//EXAMPLE API Request Methods:
-//app GET method to read a resource, retrieving data without altering it
-app.get("/hello", (req, res) => {
-  res.send("GET Hello World!");
-});
+// API Request Methods:
 
-//app POST method to create a resource in a REST environment
-app.post("/post", (req, res) => {
-  res.send("POST hello world!");
-});
-
-//app PUT method to update a resource
-app.put("/put", (req, res) => {
-  res.send("PUT hello world!");
+app.get("/getIndex", (req, res) => {
+  console.log(path.join(__dirname, config.site.path, "/index.html"));
+  res.sendFile(path.join(__dirname, config.site.path, "/index.html"));  
 });
 
 //get the posts for the database and display them on the main page of the site

@@ -17,7 +17,7 @@ function onload() {
         fetch('/getIndex',
         {
             method: 'GET',
-        });
+        }).then(resp =>console.log(resp));
     }
     if(window.location.href.includes('/index.html')) { // are we on the index (main) page
         console.log('Index page loaded');
