@@ -16,4 +16,5 @@ module.exports = {
     GET_ALL_POSTS,
     GET_USER,
     USER_EXIST,
+    GET_A_USERS_POSTS
 }
