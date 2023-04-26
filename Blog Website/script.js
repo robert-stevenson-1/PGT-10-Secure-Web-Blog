@@ -8,14 +8,16 @@ function onload() {
     console.log('Page loaded');
     console.log(window.location.href)
     if(!isLoggedIn()) {
-        addLoginSignupButtons()
+        addLoginSignupButtons();
+    }else{
+        addExtraNav();
     }
     
     // check if what page we are on
     if(window.location.href.includes('/posts.html')) { // are we on the index (main) page
         console.log('Index page loaded');
         // make a GET request for the post in the database on the server
-        fetch('/get_posts',
+        fetch('/getPosts',
         {
             method: 'GET',
         }).then(function(response){ //with the response....
@@ -52,84 +54,84 @@ function processPosts(posts) { //with the JSON response data
 
 /**
  * function to process the posts from the server and add them to the website
- * @param {string} post_title The title of the post
- * @param {string} post_body The body/content of the post
- * @param {string} post_user The post's user
- * @param {string} post_date The date that the post was posted (as a string) in the dd/mm/yyyy format
+ * @param {string} postTitle The title of the post
+ * @param {string} postBody The body/content of the post
+ * @param {string} postUser The post's user
+ * @param {string} postDate The date that the post was posted (as a string) in the dd/mm/yyyy format
  * @returns Return the HTML element for displaying the whole post
  */
-function generatePostTemplate(post_title, post_body, post_user, post_date){
+function generatePostTemplate(postTitle, postBody, postUser, postDate){
     // create the container of the post
-    var div_post_container = document.createElement('div');
-    var div_center = document.createElement('div'); // container for centering the post
-    var h3_post_title = document.createElement('h3');
-    var p_post_body = document.createElement('p');
-    var div_post_info = document.createElement('div');
-    var div_post_user = document.createElement('div');
-    var div_post_date = document.createElement('div');
+    var divPostContainer = document.createElement('div');
+    var divCenter = document.createElement('div'); // container for centering the post
+    var h3PostTitle = document.createElement('h3');
+    var pPostBody = document.createElement('p');
+    var divPostInfo = document.createElement('div');
+    var divPostUser = document.createElement('div');
+    var divPostDate = document.createElement('div');
 
     // structure all the post's elements
-    div_post_container.appendChild(div_center);
-    div_post_container.appendChild(div_post_info);
+    divPostContainer.appendChild(divCenter);
+    divPostContainer.appendChild(divPostInfo);
 
-    div_center.appendChild(h3_post_title);
-    div_center.appendChild(p_post_body);
+    divCenter.appendChild(h3PostTitle);
+    divCenter.appendChild(pPostBody);
 
-    div_post_info.appendChild(div_post_user);
-    div_post_info.appendChild(div_post_date);
+    divPostInfo.appendChild(divPostUser);
+    divPostInfo.appendChild(divPostDate);
 
     //add the style tags to the HTML elements
-    div_post_container.classList.add('container-posts');
+    divPostContainer.classList.add('container-posts');
     
-    div_center.classList.add('container-center')
+    divCenter.classList.add('container-center')
 
-    div_post_user.classList.add('left-aligned')
-    div_post_date.classList.add('right-aligned')
+    divPostUser.classList.add('left-aligned')
+    divPostDate.classList.add('right-aligned')
 
     // add the information to the relevant post elements
-    h3_post_title.textContent = post_title;
-    div_post_user.textContent = "Posted by: " + post_user;
-    div_post_date.textContent = "Date Posted: " + post_date;
-    p_post_body.textContent = post_body;
+    h3PostTitle.textContent = postTitle;
+    divPostUser.textContent = "Posted by: " + postUser;
+    divPostDate.textContent = "Date Posted: " + postDate;
+    pPostBody.textContent = postBody;
 
     //TODO: Make sure you only allow edits to the users own posts
     if (isLoggedIn()) {
         // create options for the post if we in a logged in session
-        var div_post_option = document.createElement('div');
-        div_post_info.appendChild(div_post_option);
-        div_post_option.classList.add('container-center')
+        var divPostOption = document.createElement('div');
+        divPostInfo.appendChild(divPostOption);
+        divPostOption.classList.add('container-center')
 
         // delete option
         // TODO: add click event handler
-        var btn_delete_post = document.createElement('a');
-        var fa_delete_post = document.createElement('i');
+        var btnDeletePost = document.createElement('a');
+        var faDeletePost = document.createElement('i');
         
-        div_post_option.appendChild(btn_delete_post);
-        btn_delete_post.appendChild(fa_delete_post);
+        divPostOption.appendChild(btnDeletePost);
+        btnDeletePost.appendChild(faDeletePost);
         
-        btn_delete_post.classList.add('nav-button');
-        fa_delete_post.classList.add('fa');
-        fa_delete_post.classList.add('fa-trash');
+        btnDeletePost.classList.add('nav-button');
+        faDeletePost.classList.add('fa');
+        faDeletePost.classList.add('fa-trash');
         
-        btn_delete_post.href = "#";
+        btnDeletePost.href = "#";
         
         // edit option
         // TODO: add click event handler
-        var btn_edit_post = document.createElement('a');
-        var fa_edit_post = document.createElement('i');
+        var btnEditPost = document.createElement('a');
+        var faEditPost = document.createElement('i');
         
-        div_post_option.appendChild(btn_edit_post);
-        btn_edit_post.appendChild(fa_edit_post);
+        divPostOption.appendChild(btnEditPost);
+        btnEditPost.appendChild(faEditPost);
         
-        btn_edit_post.classList.add('nav-button');
-        fa_edit_post.classList.add('fa');
-        fa_edit_post.classList.add('fa-pencil');
+        btnEditPost.classList.add('nav-button');
+        faEditPost.classList.add('fa');
+        faEditPost.classList.add('fa-pencil');
 
-        btn_edit_post.href = "#";
+        btnEditPost.href = "#";
     }
     
     //return the created post html object
-    return div_post_container
+    return divPostContainer
 }
 
 /**
@@ -140,10 +142,10 @@ function isLoggedIn() {
     // TODO: check with the server if we are logged in or not
 
     //return true if we are logged in
-    // return true;
+    return true;
 
     // not logged in
-    return false;
+    // return false;
 }
 
 /**
@@ -152,24 +154,46 @@ function isLoggedIn() {
 function addLoginSignupButtons(){
     // <a href="LoginSignup.html" class="nav-button left-aligned LoginSignup"><i class="">Log in</i></a>
     // <a href="LoginSignup.html" class="nav-button left-aligned LoginSignup"><i class="">Sign Up</i></a>
-    main_nav = document.getElementById('nav-main');
+    mainNav = document.getElementById('nav-main');
     
-    btn_login = document.createElement('a');
-    btn_login_content = document.createElement('i');
-    btn_login.appendChild(btn_login_content);
-    btn_login_content.textContent = "Log in";
-    btn_login.href = "LoginSignup.html";
-    btn_login.classList.add('nav-button');
-    btn_login.classList.add('left-aligned');
+    btnLogin = document.createElement('a');
+    btnLoginContent = document.createElement('i');
+    btnLogin.appendChild(btnLoginContent);
+    btnLoginContent.textContent = "Log in";
+    btnLogin.href = "LoginSignup.html";
+    btnLogin.classList.add('nav-button');
+    btnLogin.classList.add('left-aligned');
     
-    btn_signup = document.createElement('a');
-    btn_signup_content = document.createElement('i');
-    btn_signup.appendChild(btn_signup_content);
-    btn_signup_content.textContent = "Sign Up";
-    btn_signup.href = "LoginSignup.html";
-    btn_signup.classList.add('nav-button');
-    btn_signup.classList.add('left-aligned');
+    btnSignup = document.createElement('a');
+    btnSignupContent = document.createElement('i');
+    btnSignup.appendChild(btnSignupContent);
+    btnSignupContent.textContent = "Sign Up";
+    btnSignup.href = "LoginSignup.html";
+    btnSignup.classList.add('nav-button');
+    btnSignup.classList.add('left-aligned');
 
-    main_nav.appendChild(btn_login);
-    main_nav.appendChild(btn_signup);
+    mainNav.appendChild(btnLogin);
+    mainNav.appendChild(btnSignup);
+}
+
+function addExtraNav(){
+    mainNav = document.getElementById('nav-main');
+    
+    btnLogOut = document.createElement('a');
+    btnLogOutContent = document.createElement('i');
+    btnLogOut.appendChild(btnLoginContent);
+    btnLogOutContent.textContent = "Log in";
+    btnLogOut.href = "LoginSignup.html";
+    btnLogOut.classList.add('nav-button');
+    btnLogOut.classList.add('left-aligned');
+
+    btnViewPost = document.createElement('a');
+    btnViewPostContent = document.createElement('i');
+    btnViewPost.appendChild(btnViewPostContent);
+    btnViewPostContent.textContent = "View Posts";
+    btnViewPost.href = "posts.html";
+    btnViewPost.classList.add('nav-button');
+    btnViewPost.classList.add('left-aligned');
+
+    mainNav.appendChild(btnViewPost);
 }

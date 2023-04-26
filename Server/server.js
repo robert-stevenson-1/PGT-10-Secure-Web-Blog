@@ -26,7 +26,7 @@ const bodyParser = require("body-parser"); // import body-parser
 const pg = require("pg"); // import the postgresql module
 const path = require("path"); // import the path module
 
-const DB_Queries = require("./SQL_queries.js"); // import the SQL queries that we will use regularly
+const dbQueries = require("./SQL_queries.js"); // import the SQL queries that we will use regularly
 const config = require("./config.js"); // import the config file
 
 //setup the express server app
@@ -60,11 +60,11 @@ app.listen(port, () => {
 // API Request Methods:
 
 //get the posts for the database and display them on the main page of the site
-app.get("/get_posts", async (req, res) => {
+app.get("/getPosts", async (req, res) => {
   // console.log("Getting posts for database and sending them to be displayed");
 
   // make a read request from the database
-  db_result = await queryDB(DB_Queries.GET_ALL_POSTS);
+  dbResult = await queryDB(dbQueries.GET_ALL_POSTS);
 
   //create a JSON object for posts info to send to the frontend as a response for processing and displaying
   const postToAdd = {
@@ -73,9 +73,9 @@ app.get("/get_posts", async (req, res) => {
   };
 
   // TODO: add each posts info to the JSON to return
-  for (var key in db_result.rows) {
-    if (db_result.rows.hasOwnProperty(key)) {
-      var rowJSON = db_result.rows[key];
+  for (var key in dbResult.rows) {
+    if (dbResult.rows.hasOwnProperty(key)) {
+      var rowJSON = dbResult.rows[key];
       //convert the SQL timestamp format to dd/mm/yyyy date format
       tempDate = new Date(rowJSON.created_at).toLocaleDateString("en-GB");
 
@@ -102,8 +102,8 @@ async function queryDB(query) {
   //try to get the data from the database
   try {
     // make a read request from the database
-    data = await client.query(DB_Queries.GET_ALL_POSTS);
-    // console.log(db_result.rows)
+    data = await client.query(dbQueries.GET_ALL_POSTS);
+    // console.log(dbResult.rows)
   } finally {
     client.end((err) => {
       // source: https://node-postgres.com/apis/client#clientend
