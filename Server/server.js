@@ -59,11 +59,6 @@ app.listen(port, () => {
 
 // API Request Methods:
 
-app.get("/getIndex", (req, res) => {
-  console.log(path.join(__dirname, config.site.path, "/index.html"));
-  res.sendFile(path.join(__dirname, config.site.path, "/index.html"));  
-});
-
 //get the posts for the database and display them on the main page of the site
 app.get("/get_posts", async (req, res) => {
   // console.log("Getting posts for database and sending them to be displayed");
