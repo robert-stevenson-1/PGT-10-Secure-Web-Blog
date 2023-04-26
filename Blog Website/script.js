@@ -11,15 +11,8 @@ function onload() {
         addLoginSignupButtons()
     }
     
-    // check if we are on home/start/initial url
-    if(window.location.href == 'http://localhost:3000/') { // auto server the index page 
-        console.log('auto direct to index');
-        fetch('/getIndex',
-        {
-            method: 'GET',
-        }).then(resp =>console.log(resp));
-    }
-    if(window.location.href.includes('/index.html')) { // are we on the index (main) page
+    // check if what page we are on
+    if(window.location.href.includes('/posts.html')) { // are we on the index (main) page
         console.log('Index page loaded');
         // make a GET request for the post in the database on the server
         fetch('/get_posts',
