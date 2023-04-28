@@ -7,6 +7,7 @@ window.onload = onload()
 function onload() {
     console.log('Page loaded');
     console.log(window.location.href)
+    
     if(!isLoggedIn()) {
         addLoginSignupButtons();
     }else{
@@ -181,7 +182,7 @@ function addExtraNav(){
     
     btnLogOut = document.createElement('a');
     btnLogOutContent = document.createElement('i');
-    btnLogOut.appendChild(btnLoginContent);
+    btnLogOut.appendChild(btnLogOutContent);
     btnLogOutContent.textContent = "Log in";
     btnLogOut.href = "LoginSignup.html";
     btnLogOut.classList.add('nav-button');
