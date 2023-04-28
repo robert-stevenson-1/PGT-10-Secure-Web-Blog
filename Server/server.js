@@ -93,6 +93,43 @@ app.get("/getPosts", async (req, res) => {
   res.json(postToAdd);
 });
 
+app.post('/login', (req, res) => {
+  const { username, password } = req.body;
+
+  // Connect to the database using the configuration options
+  const pool = new pg.Pool(config.database);
+  pool.connect((err, client, done) => {
+      if (err) {
+          console.error('Error connecting to database', err);
+          res.status(500).json({ success: false, message: 'Internal server error' });
+          return;
+      }
+
+      // Query the database for the user with the given username and password
+      const query = 'SELECT * FROM accounts WHERE username = $1 AND password = $2';
+      const values = [username, password];
+      client.query(query, values, (err, result) => {
+          done(); // Release the client back to the pool
+
+          if (err) {
+              console.error('Error querying database', err);
+              res.status(500).json({ success: false, message: 'Internal server error' });
+              return;
+          }
+
+          if (result.rows.length === 1) {
+              // If the query returns exactly one row, the user is authenticated
+              res.json({ success: true });
+              console.log("success");
+          } else {
+              // If the query returns no rows or more than one row, the user is not authenticated
+              res.json({ success: false, message: 'Invalid username or password' });
+              console.log("notsuccess");
+          }
+      });
+  });
+});
+
 async function queryDB(query) {
   data = {}
 

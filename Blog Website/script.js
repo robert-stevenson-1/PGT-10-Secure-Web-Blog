@@ -198,3 +198,38 @@ function addExtraNav(){
 
     mainNav.appendChild(btnViewPost);
 }
+
+// Logın form code:
+
+const form = document.querySelector('form');
+const usernameInput = document.querySelector('#username');
+const passwordInput = document.querySelector('#password');
+
+form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    const username = usernameInput.value;
+    const password = passwordInput.value;
+    const responseDiv = document.getElementById('response');
+    const response = await fetch('/login', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ username, password })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Redirect to the home page
+            window.location.href = '/posts.html';
+            responseDiv.innerText = 'Login successful!';
+        } else {
+            // Display an error message
+            const error = document.querySelector('#error');
+            responseDiv.innerText = 'Wrong username or password.';
+            error.textContent = data.message;
+        }
+    })
+    .catch(error => console.error(error));
+});
