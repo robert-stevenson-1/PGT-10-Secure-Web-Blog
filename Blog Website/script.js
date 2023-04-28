@@ -22,8 +22,8 @@ function onload() {
         {
             method: 'GET',
         }).then(function(response){ //with the response....
-            console.error("Status: " + response.status);
-            console.error(response);
+            console.log("Status: " + response.status);
+            console.log(response);
             return response.json() // return the JSON of the response
         })
         .then(data => processPosts(data))
