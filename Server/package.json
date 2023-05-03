@@ -1,7 +1,20 @@
 {
+  "name": "PGT-10-Secure-Web-Blog",
+  "version": "1.0.0",
   "dependencies": {
     "body-parser": "^1.20.2",
+    "chai": "^4.3.7",
+    "chai-http": "^4.3.0",
+    "chai-json": "^1.0.0",
     "express": "^4.18.2",
+    "mocha": "^10.2.0",
     "pg": "^8.10.0"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "type": "commonjs",
+  "directories": {
+    "test": "test"
   }
 }
