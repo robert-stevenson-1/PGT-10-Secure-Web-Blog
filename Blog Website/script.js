@@ -143,10 +143,10 @@ function isLoggedIn() {
     // TODO: check with the server if we are logged in or not
 
     //return true if we are logged in
-    return true;
+    // return true;
 
     // not logged in
-    // return false;
+    return false;
 }
 
 /**
