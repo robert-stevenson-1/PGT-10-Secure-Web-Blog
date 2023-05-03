@@ -63,6 +63,13 @@ app.listen(port, () => {
 app.get("/getPosts", async (req, res) => {
   // console.log("Getting posts for database and sending them to be displayed");
 
+  posts = await getPostsJSON();
+
+  // send the posts to add to the site in the post container
+  res.send(posts);
+});
+
+async function getPostsJSON() {
   // make a read request from the database
   dbResult = await queryDB(dbQueries.GET_ALL_POSTS);
 
@@ -72,7 +79,7 @@ app.get("/getPosts", async (req, res) => {
     posts: [],
   };
 
-  // TODO: add each posts info to the JSON to return
+  // add each posts info to the JSON to return
   for (var key in dbResult.rows) {
     if (dbResult.rows.hasOwnProperty(key)) {
       var rowJSON = dbResult.rows[key];
@@ -89,9 +96,8 @@ app.get("/getPosts", async (req, res) => {
     }
   }
 
-  // send the posts to add to the site in the post container
-  res.json(postToAdd);
-});
+  return postToAdd;
+}
 
 app.post('/login', (req, res) => {
   const { username, password } = req.body;
@@ -131,11 +137,11 @@ app.post('/login', (req, res) => {
 });
 
 async function queryDB(query) {
-  data = {}
+  data = {};
 
   //create a client to interact with the database
   const client = await pool.connect(); // create and connect a client to the database
-  
+
   //try to get the data from the database
   try {
     // make a read request from the database
@@ -150,6 +156,12 @@ async function queryDB(query) {
       }
     });
   }
-  
+
   return data;
 }
+
+module.exports = {
+  queryDB,
+  getPostsJSON,
+  app,
+};
