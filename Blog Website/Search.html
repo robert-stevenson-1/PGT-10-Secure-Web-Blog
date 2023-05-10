@@ -49,8 +49,13 @@
         <!-- Search -->
         <a href="#" class="nav-search right-aligned">
           <form action="Search.html" method="GET">
-            <input id="search" type="text" placeholder="Search">
-            <button type="submit"><i class="fa fa-search"></i></button>
+            <input id="searchBar" type="text" placeholder="Search">
+            <!-- 
+              Removed Submit button based on this standard:
+              https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#implicit-submission
+              in favour of submitting on enter key press like most modern websites 
+            -->
+            <!-- <button id="searchBtn" type="submit"><i class="fa fa-search"></i></button> -->
           </form>
         </a>
       </div>
