@@ -11,32 +11,30 @@ formSearch.addEventListener("submit", searchPosts);
  * On the page load, run...
  */
 function onload() {
-  console.log("Page loaded");
-  console.log(window.location.href);
-
-  if (!isLoggedIn()) {
-    addLoginSignupButtons();
-  } else {
-    addExtraNav();
-  }
-
-  // check if what page we are on
-  if (window.location.href.includes("/posts.html")) {
-    // are we on the index (main) page
-    console.log("Index page loaded");
-    // make a GET request for the post in the database on the server
-    fetch("/getPosts", {
-      method: "GET",
-    })
-      .then(function (response) {
-        //with the response....
-        console.error("Status: " + response.status);
-        console.error(response);
-        return response.json(); // return the JSON of the response
-      })
-      .then((data) => processPosts(data))
-      .catch((error) => console.error(error)); // catch any error and print it out
-  }
+    console.log('Page loaded');
+    console.log(window.location.href)
+    
+    if(!isLoggedIn()) {
+        addLoginSignupButtons();
+    }else{
+        addExtraNav();
+    }
+    
+    // check if what page we are on
+    if(window.location.href.includes('/posts.html')) { // are we on the index (main) page
+        console.log('Index page loaded');
+        // make a GET request for the post in the database on the server
+        fetch('/getPosts',
+        {
+            method: 'GET',
+        }).then(function(response){ //with the response....
+            console.log("Status: " + response.status);
+            console.log(response);
+            return response.json() // return the JSON of the response
+        })
+        .then(data => processPosts(data))
+        .catch(error => console.error(error)); // catch any error and print it out
+    }
 }
 
 /**
@@ -163,11 +161,11 @@ function generatePostTemplate(postTitle, postBody, postUser, postDate) {
 function isLoggedIn() {
   // TODO: check with the server if we are logged in or not
 
-  //return true if we are logged in
-  return true;
+    //return true if we are logged in
+    // return true;
 
-  // not logged in
-  // return false;
+    // not logged in
+    return false;
 }
 
 /**
@@ -219,3 +217,38 @@ function addExtraNav() {
 
   mainNav.appendChild(btnViewPost);
 }
+
+// Logın form code:
+
+const form = document.querySelector('form');
+const usernameInput = document.querySelector('#username');
+const passwordInput = document.querySelector('#password');
+
+form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    const username = usernameInput.value;
+    const password = passwordInput.value;
+    const responseDiv = document.getElementById('response');
+    const response = await fetch('/login', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ username, password })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Redirect to the home page
+            window.location.href = '/posts.html';
+            responseDiv.innerText = 'Login successful!';
+        } else {
+            // Display an error message
+            const error = document.querySelector('#error');
+            responseDiv.innerText = 'Wrong username or password.';
+            error.textContent = data.message;
+        }
+    })
+    .catch(error => console.error(error));
+});

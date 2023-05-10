@@ -63,6 +63,13 @@ app.listen(port, () => {
 app.get("/getPosts", async (req, res) => {
   // console.log("Getting posts for database and sending them to be displayed");
 
+  posts = await getPostsJSON();
+
+  // send the posts to add to the site in the post container
+  res.send(posts);
+});
+
+async function getPostsJSON() {
   // make a read request from the database
   dbResult = await queryDB(dbQueries.GET_ALL_POSTS);
 
@@ -72,7 +79,7 @@ app.get("/getPosts", async (req, res) => {
     posts: [],
   };
 
-  // TODO: add each posts info to the JSON to return
+  // add each posts info to the JSON to return
   for (var key in dbResult.rows) {
     if (dbResult.rows.hasOwnProperty(key)) {
       var rowJSON = dbResult.rows[key];
@@ -89,16 +96,52 @@ app.get("/getPosts", async (req, res) => {
     }
   }
 
-  // send the posts to add to the site in the post container
-  res.json(postToAdd);
+  return postToAdd;
+}
+
+app.post('/login', (req, res) => {
+  const { username, password } = req.body;
+
+  // Connect to the database using the configuration options
+  const pool = new pg.Pool(config.database);
+  pool.connect((err, client, done) => {
+      if (err) {
+          console.error('Error connecting to database', err);
+          res.status(500).json({ success: false, message: 'Internal server error' });
+          return;
+      }
+
+      // Query the database for the user with the given username and password
+      const query = 'SELECT * FROM accounts WHERE username = $1 AND password = $2';
+      const values = [username, password];
+      client.query(query, values, (err, result) => {
+          done(); // Release the client back to the pool
+
+          if (err) {
+              console.error('Error querying database', err);
+              res.status(500).json({ success: false, message: 'Internal server error' });
+              return;
+          }
+
+          if (result.rows.length === 1) {
+              // If the query returns exactly one row, the user is authenticated
+              res.json({ success: true });
+              console.log("success");
+          } else {
+              // If the query returns no rows or more than one row, the user is not authenticated
+              res.json({ success: false, message: 'Invalid username or password' });
+              console.log("notsuccess");
+          }
+      });
+  });
 });
 
 async function queryDB(query) {
-  data = {}
+  data = {};
 
   //create a client to interact with the database
   const client = await pool.connect(); // create and connect a client to the database
-  
+
   //try to get the data from the database
   try {
     // make a read request from the database
@@ -113,6 +156,12 @@ async function queryDB(query) {
       }
     });
   }
-  
+
   return data;
 }
+
+module.exports = {
+  queryDB,
+  getPostsJSON,
+  app,
+};
