@@ -73,7 +73,27 @@ async function searchPosts() {
         // trim makes sure to cut off any tailing whitespace
         val = val.trim(); // trim the tailing whitespace
         val = val.toLowerCase(); // reduce all the characters to lowercase representation where possible
-        console.log(val);
+        //data to send
+        data = {
+            "search": val,
+        };
+        
+        console.log(JSON.stringify(data));
+        // https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#supplying_request_options
+        fetch('/Search',
+        {
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+        }).then(function (response) { //with the response....
+            console.log("Status: " + response.status);
+            console.log(response);
+            // return response.json() // return the JSON of the response
+        })
+        // .then(data => processPosts(data))
+        .catch(error => console.error(error)); // catch any error and print it out
     }
 }
 
