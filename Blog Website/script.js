@@ -50,6 +50,9 @@ function processPosts(posts) {
     posts = posts.posts;
     //get the posts container from the DOM
     postsContainer = document.getElementById("Posts");
+    if (!postsContainer){
+        throw new Error('Can not find posts container');
+    }
     //TODO: process the response data (Posts) into HTML elements that can be added to our website
     for (var postKey in posts) {
         console.log(posts[postKey]);
@@ -77,7 +80,6 @@ async function searchPosts() {
         data = {
             "search": val,
         };
-        
         console.log(JSON.stringify(data));
         // https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#supplying_request_options
         fetch('/Search',
@@ -90,9 +92,9 @@ async function searchPosts() {
         }).then(function (response) { //with the response....
             console.log("Status: " + response.status);
             console.log(response);
-            // return response.json() // return the JSON of the response
+            return response.json() // return the JSON of the response
         })
-        // .then(data => processPosts(data))
+        .then(data => processPosts(data))
         .catch(error => console.error(error)); // catch any error and print it out
     }
 }

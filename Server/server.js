@@ -75,17 +75,46 @@ app.post("/Search", async (req, res) => {
   //      into the query with battle-tested parameter substitution code within the server itself 
 
   params = [
-    req.body["search"]
+    '%'+req.body["search"]+'%' // Wrap the parameter in % wildcards for pattern recognition in WHERE ... LIKE query
   ];
+  console.log(params);
   data = {};
   //create a client to interact with the database
   const client = await pool.connect(); // create and connect a client to the database
   //try to get the data from the database
   try {
     // Create send the query with db with the parameter values and read request from the database
-    data = await client.query(dbQueries.SEARCH_POSTS, params);
-    console.log(data)
-    console.log(data.rows)
+    dbResult = await client.query(dbQueries.SEARCH_POSTS, params);
+    // console.log(data)
+    console.log(dbResult.rows)
+
+    //create a JSON object for posts info to send to the frontend as a response for processing and displaying
+    const postToAdd = {
+      //TEST DATA
+      posts: [],
+    };
+
+    // add each posts info to the JSON to return
+    for (var key in dbResult.rows) {
+      if (dbResult.rows.hasOwnProperty(key)) {
+        var rowJSON = dbResult.rows[key];
+        //convert the SQL timestamp format to dd/mm/yyyy date format
+        tempDate = new Date(rowJSON.created_at).toLocaleDateString("en-GB");
+
+        postJSON = {
+          user: rowJSON.username,
+          postTitle: rowJSON.title,
+          postBody: rowJSON.content,
+          datePost: tempDate,
+        };
+        postToAdd.posts.push(postJSON);
+      }
+    }
+    //send the data back
+    res.send(postToAdd);
+
+  }catch (error){
+    console.log(error.stack);
   } finally {
     client.end((err) => {
       // source: https://node-postgres.com/apis/client#clientend
@@ -95,8 +124,6 @@ app.post("/Search", async (req, res) => {
       }
     });
   }
-
-  return data;
 });
 
 async function getPostsJSON() {
