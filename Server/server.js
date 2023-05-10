@@ -67,17 +67,19 @@ app.get("/getPosts", async (req, res) => {
   res.send(posts);
 });
 
-app.post("/Search", async (req, res) => {
+app.post('/Search', async (req, res) => {
   // To Secure against SQL injection:
   //  - Use parameterized queries (https://node-postgres.com/features/queries#Parameterized%20query)
   //    - node-postgres supports parameterized queries, passing your query text unaltered as well 
   //      as your parameters to the PostgreSQL server where the parameters are safely substituted 
   //      into the query with battle-tested parameter substitution code within the server itself 
-
+  
+  // url param pass aid: https://www.digitalocean.com/community/tutorials/use-expressjs-to-get-url-and-post-parameters
   params = [
-    '%'+req.body["search"]+'%' // Wrap the parameter in % wildcards for pattern recognition in WHERE ... LIKE query
+    '%'+req.query.search+'%' // Wrap the parameter in % wildcards for pattern recognition in WHERE ... LIKE query
   ];
   console.log(params);
+
   data = {};
   //create a client to interact with the database
   const client = await pool.connect(); // create and connect a client to the database

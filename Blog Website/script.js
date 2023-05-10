@@ -7,6 +7,7 @@ const inputSearch = document.getElementById("searchBar");
 // when ever the search bar is typed in then run event
 inputSearch.addEventListener("keyup", function(event) {
     if (event.key === "Enter") {
+        console.log(location.href);
         searchPosts();
     }
 });
@@ -70,25 +71,26 @@ function processPosts(posts) {
 
 async function searchPosts() {
     console.log(inputSearch);
+    //data to send
     let val = inputSearch.value;
     // check for presence of value and is larger than 0
     if (val && val.trim().length > 0) {
         // trim makes sure to cut off any tailing whitespace
         val = val.trim(); // trim the tailing whitespace
         val = val.toLowerCase(); // reduce all the characters to lowercase representation where possible
-        //data to send
-        data = {
-            "search": val,
-        };
-        console.log(JSON.stringify(data));
-        // https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#supplying_request_options
-        fetch('/Search',
+        // data = {
+        //     "search": val,
+        // };
+        // console.log(JSON.stringify(data));
+
+        //written with the aid of: https://www.digitalocean.com/community/tutorials/use-expressjs-to-get-url-and-post-parameters
+        fetch(`/Search.html?search=${val}`,
         {
             method: 'POST',
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify(data),
+            // body: JSON.stringify(data),
         }).then(function (response) { //with the response....
             console.log("Status: " + response.status);
             console.log(response);
