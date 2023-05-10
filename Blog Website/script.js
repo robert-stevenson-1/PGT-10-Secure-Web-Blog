@@ -249,7 +249,7 @@ function addExtraNav() {
 
 // Logın form code:
 
-const form = document.querySelector('form');
+const form = document.getElementById('loginForm');
 const usernameInput = document.querySelector('#username');
 const passwordInput = document.querySelector('#password');
 
@@ -259,6 +259,7 @@ form.addEventListener('submit', async (event) => {
     const username = usernameInput.value;
     const password = passwordInput.value;
     const responseDiv = document.getElementById('response');
+    console.log(responseDiv);
     const response = await fetch('/login', {
         method: 'POST',
         headers: {
