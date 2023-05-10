@@ -50,7 +50,7 @@ async function onload() {
         // process and display the results
         await processPosts(searchResult); // the result here are posts
         // remove the results from storage
-        // sessionStorage.removeItem("searchResult");
+        sessionStorage.removeItem("searchResult");
     }
 }
 
