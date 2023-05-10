@@ -15,7 +15,7 @@ inputSearch.addEventListener("keyup", function(event) {
 /**
  * On the page load, run...
  */
-function onload() {
+async function onload() {
     console.log('Page loaded');
     console.log(window.location.href)
 
@@ -26,7 +26,7 @@ function onload() {
     }
 
     // check if what page we are on
-    if (window.location.href.includes('/posts.html')) { // are we on the index (main) page
+    if (window.location.href.includes('/posts.html')) { // are we on the posts page
         console.log('Index page loaded');
         // make a GET request for the post in the database on the server
         fetch('/getPosts',
@@ -39,6 +39,18 @@ function onload() {
             })
             .then(data => processPosts(data))
             .catch(error => console.error(error)); // catch any error and print it out
+    }
+
+    if (window.location.href.includes('/Search.html')) { // are we on the search page
+        // get the search from sessionStorage (ref: https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage)
+        let searchResult = sessionStorage.getItem("searchResult");
+        //parse the data string from sessionStorage as JSON again
+        searchResult = JSON.parse(searchResult);
+        console.log(searchResult);
+        // process and display the results
+        await processPosts(searchResult); // the result here are posts
+        // remove the results from storage
+        // sessionStorage.removeItem("searchResult");
     }
 }
 
@@ -71,6 +83,7 @@ function processPosts(posts) {
 
 async function searchPosts() {
     console.log(inputSearch);
+
     //data to send
     let val = inputSearch.value;
     // check for presence of value and is larger than 0
@@ -84,19 +97,26 @@ async function searchPosts() {
         // console.log(JSON.stringify(data));
 
         //written with the aid of: https://www.digitalocean.com/community/tutorials/use-expressjs-to-get-url-and-post-parameters
-        fetch(`/Search.html?search=${val}`,
+        fetch(`/Search?search=${val}`,
         {
             method: 'POST',
             headers: {
                 "Content-Type": "application/json",
             },
-            // body: JSON.stringify(data),
         }).then(function (response) { //with the response....
             console.log("Status: " + response.status);
             console.log(response);
             return response.json() // return the JSON of the response
+        }).then(function(data){
+            // store the search results in session storage so that we can use it in the search.html page
+            // Reference: https://www.w3schools.com/HTML/html5_webstorage.asp
+            console.log(data);
+            //store the JSON data as a string in sessionStorage
+            sessionStorage.setItem("searchResult", JSON.stringify(data));
+        }).then(function(){
+            // redirect to search page
+            window.location.href = '/Search.html';
         })
-        .then(data => processPosts(data))
         .catch(error => console.error(error)); // catch any error and print it out
     }
 }
@@ -209,7 +229,7 @@ function addLoginSignupButtons() {
     btnLoginContent = document.createElement("i");
     btnLogin.appendChild(btnLoginContent);
     btnLoginContent.textContent = "Log in";
-    btnLogin.href = "LoginSignup.html";
+    btnLogin.href = "Index.html";
     btnLogin.classList.add("nav-button");
     btnLogin.classList.add("left-aligned");
 
@@ -217,7 +237,7 @@ function addLoginSignupButtons() {
     btnSignupContent = document.createElement("i");
     btnSignup.appendChild(btnSignupContent);
     btnSignupContent.textContent = "Sign Up";
-    btnSignup.href = "LoginSignup.html";
+    btnSignup.href = "signup.html";
     btnSignup.classList.add("nav-button");
     btnSignup.classList.add("left-aligned");
 
