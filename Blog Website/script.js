@@ -1,55 +1,76 @@
-//set the events
-window.onload = onload()
+// === set the events ===
+window.onload = onload();
+
+const formSearch = document.getElementById("formSearch");
+const inputSearch = document.getElementById("searchBar");
+// const btnSearch = document.getElementById('searchBtn');
+// when ever the search bar is typed in then run event
+formSearch.addEventListener("submit", searchPosts);
 
 /**
  * On the page load, run...
  */
 function onload() {
-    console.log('Page loaded');
-    console.log(window.location.href)
-    
-    if(!isLoggedIn()) {
-        addLoginSignupButtons();
-    }else{
-        addExtraNav();
-    }
-    
-    // check if what page we are on
-    if(window.location.href.includes('/posts.html')) { // are we on the index (main) page
-        console.log('Index page loaded');
-        // make a GET request for the post in the database on the server
-        fetch('/getPosts',
-        {
-            method: 'GET',
-        }).then(function(response){ //with the response....
-            console.error("Status: " + response.status);
-            console.error(response);
-            return response.json() // return the JSON of the response
-        })
-        .then(data => processPosts(data))
-        .catch(error => console.error(error)); // catch any error and print it out
-    }
+  console.log("Page loaded");
+  console.log(window.location.href);
+
+  if (!isLoggedIn()) {
+    addLoginSignupButtons();
+  } else {
+    addExtraNav();
+  }
+
+  // check if what page we are on
+  if (window.location.href.includes("/posts.html")) {
+    // are we on the index (main) page
+    console.log("Index page loaded");
+    // make a GET request for the post in the database on the server
+    fetch("/getPosts", {
+      method: "GET",
+    })
+      .then(function (response) {
+        //with the response....
+        console.error("Status: " + response.status);
+        console.error(response);
+        return response.json(); // return the JSON of the response
+      })
+      .then((data) => processPosts(data))
+      .catch((error) => console.error(error)); // catch any error and print it out
+  }
 }
 
 /**
  * Take the post data from the server and process it to display on the webpage
  * @param {JSON} posts The posts data as JSON that will be processed and added to the webpage
  */
-function processPosts(posts) { //with the JSON response data
-    posts = posts.posts
-    //get the posts container from the DOM
-    postsContainer = document.getElementById('Posts')
-    //TODO: process the response data (Posts) into HTML elements that can be added to our website
-    for (var postKey in posts) {
-        console.log(posts[postKey])
-        //create a new post element
-        postElement = generatePostTemplate(
-            posts[postKey].postTitle, 
-            posts[postKey].postBody,
-            posts[postKey].user,
-            posts[postKey].datePost)
-        //add it to the Page
-        postsContainer.appendChild(postElement)
+function processPosts(posts) {
+  //with the JSON response data
+  posts = posts.posts;
+  //get the posts container from the DOM
+  postsContainer = document.getElementById("Posts");
+  //TODO: process the response data (Posts) into HTML elements that can be added to our website
+  for (var postKey in posts) {
+    console.log(posts[postKey]);
+    //create a new post element
+    postElement = generatePostTemplate(
+      posts[postKey].postTitle,
+      posts[postKey].postBody,
+      posts[postKey].user,
+      posts[postKey].datePost
+    );
+    //add it to the Page
+    postsContainer.appendChild(postElement);
+  }
+}
+
+function searchPosts(searchVal) {
+    let val = inputSearch.value;
+    // check for presence of value and is larger than 0
+    if (val && val.trim().length > 0) {
+        // trim makes sure to cut off any tailing whitespace
+        val = val.trim(); // trim the tailing whitespace
+        val = val.toLowerCase(); // reduce all the characters to lowercase representation where possible
+        alert(val);
     }
 }
 
@@ -61,78 +82,78 @@ function processPosts(posts) { //with the JSON response data
  * @param {string} postDate The date that the post was posted (as a string) in the dd/mm/yyyy format
  * @returns Return the HTML element for displaying the whole post
  */
-function generatePostTemplate(postTitle, postBody, postUser, postDate){
-    // create the container of the post
-    var divPostContainer = document.createElement('div');
-    var divCenter = document.createElement('div'); // container for centering the post
-    var h3PostTitle = document.createElement('h3');
-    var pPostBody = document.createElement('p');
-    var divPostInfo = document.createElement('div');
-    var divPostUser = document.createElement('div');
-    var divPostDate = document.createElement('div');
+function generatePostTemplate(postTitle, postBody, postUser, postDate) {
+  // create the container of the post
+  var divPostContainer = document.createElement("div");
+  var divCenter = document.createElement("div"); // container for centering the post
+  var h3PostTitle = document.createElement("h3");
+  var pPostBody = document.createElement("p");
+  var divPostInfo = document.createElement("div");
+  var divPostUser = document.createElement("div");
+  var divPostDate = document.createElement("div");
 
-    // structure all the post's elements
-    divPostContainer.appendChild(divCenter);
-    divPostContainer.appendChild(divPostInfo);
+  // structure all the post's elements
+  divPostContainer.appendChild(divCenter);
+  divPostContainer.appendChild(divPostInfo);
 
-    divCenter.appendChild(h3PostTitle);
-    divCenter.appendChild(pPostBody);
+  divCenter.appendChild(h3PostTitle);
+  divCenter.appendChild(pPostBody);
 
-    divPostInfo.appendChild(divPostUser);
-    divPostInfo.appendChild(divPostDate);
+  divPostInfo.appendChild(divPostUser);
+  divPostInfo.appendChild(divPostDate);
 
-    //add the style tags to the HTML elements
-    divPostContainer.classList.add('container-posts');
-    
-    divCenter.classList.add('container-center')
+  //add the style tags to the HTML elements
+  divPostContainer.classList.add("container-posts");
 
-    divPostUser.classList.add('left-aligned')
-    divPostDate.classList.add('right-aligned')
+  divCenter.classList.add("container-center");
 
-    // add the information to the relevant post elements
-    h3PostTitle.textContent = postTitle;
-    divPostUser.textContent = "Posted by: " + postUser;
-    divPostDate.textContent = "Date Posted: " + postDate;
-    pPostBody.textContent = postBody;
+  divPostUser.classList.add("left-aligned");
+  divPostDate.classList.add("right-aligned");
 
-    //TODO: Make sure you only allow edits to the users own posts
-    if (isLoggedIn()) {
-        // create options for the post if we in a logged in session
-        var divPostOption = document.createElement('div');
-        divPostInfo.appendChild(divPostOption);
-        divPostOption.classList.add('container-center')
+  // add the information to the relevant post elements
+  h3PostTitle.textContent = postTitle;
+  divPostUser.textContent = "Posted by: " + postUser;
+  divPostDate.textContent = "Date Posted: " + postDate;
+  pPostBody.textContent = postBody;
 
-        // delete option
-        // TODO: add click event handler
-        var btnDeletePost = document.createElement('a');
-        var faDeletePost = document.createElement('i');
-        
-        divPostOption.appendChild(btnDeletePost);
-        btnDeletePost.appendChild(faDeletePost);
-        
-        btnDeletePost.classList.add('nav-button');
-        faDeletePost.classList.add('fa');
-        faDeletePost.classList.add('fa-trash');
-        
-        btnDeletePost.href = "#";
-        
-        // edit option
-        // TODO: add click event handler
-        var btnEditPost = document.createElement('a');
-        var faEditPost = document.createElement('i');
-        
-        divPostOption.appendChild(btnEditPost);
-        btnEditPost.appendChild(faEditPost);
-        
-        btnEditPost.classList.add('nav-button');
-        faEditPost.classList.add('fa');
-        faEditPost.classList.add('fa-pencil');
+  //TODO: Make sure you only allow edits to the users own posts
+  if (isLoggedIn()) {
+    // create options for the post if we in a logged in session
+    var divPostOption = document.createElement("div");
+    divPostInfo.appendChild(divPostOption);
+    divPostOption.classList.add("container-center");
 
-        btnEditPost.href = "#";
-    }
-    
-    //return the created post html object
-    return divPostContainer
+    // delete option
+    // TODO: add click event handler
+    var btnDeletePost = document.createElement("a");
+    var faDeletePost = document.createElement("i");
+
+    divPostOption.appendChild(btnDeletePost);
+    btnDeletePost.appendChild(faDeletePost);
+
+    btnDeletePost.classList.add("nav-button");
+    faDeletePost.classList.add("fa");
+    faDeletePost.classList.add("fa-trash");
+
+    btnDeletePost.href = "#";
+
+    // edit option
+    // TODO: add click event handler
+    var btnEditPost = document.createElement("a");
+    var faEditPost = document.createElement("i");
+
+    divPostOption.appendChild(btnEditPost);
+    btnEditPost.appendChild(faEditPost);
+
+    btnEditPost.classList.add("nav-button");
+    faEditPost.classList.add("fa");
+    faEditPost.classList.add("fa-pencil");
+
+    btnEditPost.href = "#";
+  }
+
+  //return the created post html object
+  return divPostContainer;
 }
 
 /**
@@ -140,61 +161,61 @@ function generatePostTemplate(postTitle, postBody, postUser, postDate){
  * @returns True if there is a valid and active, logged in user session, else it returns false.
  */
 function isLoggedIn() {
-    // TODO: check with the server if we are logged in or not
+  // TODO: check with the server if we are logged in or not
 
-    //return true if we are logged in
-    return true;
+  //return true if we are logged in
+  return true;
 
-    // not logged in
-    // return false;
+  // not logged in
+  // return false;
 }
 
 /**
  * added the login and signup nav buttons to the top nav bar of the site if the user isn't logged in
  */
-function addLoginSignupButtons(){
-    // <a href="LoginSignup.html" class="nav-button left-aligned LoginSignup"><i class="">Log in</i></a>
-    // <a href="LoginSignup.html" class="nav-button left-aligned LoginSignup"><i class="">Sign Up</i></a>
-    mainNav = document.getElementById('nav-main');
-    
-    btnLogin = document.createElement('a');
-    btnLoginContent = document.createElement('i');
-    btnLogin.appendChild(btnLoginContent);
-    btnLoginContent.textContent = "Log in";
-    btnLogin.href = "LoginSignup.html";
-    btnLogin.classList.add('nav-button');
-    btnLogin.classList.add('left-aligned');
-    
-    btnSignup = document.createElement('a');
-    btnSignupContent = document.createElement('i');
-    btnSignup.appendChild(btnSignupContent);
-    btnSignupContent.textContent = "Sign Up";
-    btnSignup.href = "LoginSignup.html";
-    btnSignup.classList.add('nav-button');
-    btnSignup.classList.add('left-aligned');
+function addLoginSignupButtons() {
+  // <a href="LoginSignup.html" class="nav-button left-aligned LoginSignup"><i class="">Log in</i></a>
+  // <a href="LoginSignup.html" class="nav-button left-aligned LoginSignup"><i class="">Sign Up</i></a>
+  mainNav = document.getElementById("nav-main");
 
-    mainNav.appendChild(btnLogin);
-    mainNav.appendChild(btnSignup);
+  btnLogin = document.createElement("a");
+  btnLoginContent = document.createElement("i");
+  btnLogin.appendChild(btnLoginContent);
+  btnLoginContent.textContent = "Log in";
+  btnLogin.href = "LoginSignup.html";
+  btnLogin.classList.add("nav-button");
+  btnLogin.classList.add("left-aligned");
+
+  btnSignup = document.createElement("a");
+  btnSignupContent = document.createElement("i");
+  btnSignup.appendChild(btnSignupContent);
+  btnSignupContent.textContent = "Sign Up";
+  btnSignup.href = "LoginSignup.html";
+  btnSignup.classList.add("nav-button");
+  btnSignup.classList.add("left-aligned");
+
+  mainNav.appendChild(btnLogin);
+  mainNav.appendChild(btnSignup);
 }
 
-function addExtraNav(){
-    mainNav = document.getElementById('nav-main');
-    
-    btnLogOut = document.createElement('a');
-    btnLogOutContent = document.createElement('i');
-    btnLogOut.appendChild(btnLogOutContent);
-    btnLogOutContent.textContent = "Log in";
-    btnLogOut.href = "LoginSignup.html";
-    btnLogOut.classList.add('nav-button');
-    btnLogOut.classList.add('left-aligned');
+function addExtraNav() {
+  mainNav = document.getElementById("nav-main");
 
-    btnViewPost = document.createElement('a');
-    btnViewPostContent = document.createElement('i');
-    btnViewPost.appendChild(btnViewPostContent);
-    btnViewPostContent.textContent = "View Posts";
-    btnViewPost.href = "posts.html";
-    btnViewPost.classList.add('nav-button');
-    btnViewPost.classList.add('left-aligned');
+  btnLogOut = document.createElement("a");
+  btnLogOutContent = document.createElement("i");
+  btnLogOut.appendChild(btnLogOutContent);
+  btnLogOutContent.textContent = "Log in";
+  btnLogOut.href = "LoginSignup.html";
+  btnLogOut.classList.add("nav-button");
+  btnLogOut.classList.add("left-aligned");
 
-    mainNav.appendChild(btnViewPost);
+  btnViewPost = document.createElement("a");
+  btnViewPostContent = document.createElement("i");
+  btnViewPost.appendChild(btnViewPostContent);
+  btnViewPostContent.textContent = "View Posts";
+  btnViewPost.href = "posts.html";
+  btnViewPost.classList.add("nav-button");
+  btnViewPost.classList.add("left-aligned");
+
+  mainNav.appendChild(btnViewPost);
 }

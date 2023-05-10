@@ -48,14 +48,19 @@
         
         <!-- Search -->
         <a href="#" class="nav-search right-aligned">
-          <form action="Search.html" method="GET">
-            <input id="searchBar" type="text" placeholder="Search">
+          <form id="formSearch" action="Search" method="GET">
             <!-- 
               Removed Submit button based on this standard:
               https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#implicit-submission
               in favour of submitting on enter key press like most modern websites.
-              The exception is if the form has multiple input fields 
+              
+              The exception is if the form has multiple input fields.
+
+              A form with no submit buttons, implicit submission will be 
+              done if only one input is present. 
+              Therefore, pressing enter in this textbox will submit the form.
             -->
+            <input id="searchBar" type="text" placeholder="Search">
             <!-- <button id="searchBtn" type="submit"><i class="fa fa-search"></i></button> -->
           </form>
         </a>
