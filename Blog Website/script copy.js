@@ -62,6 +62,7 @@ function processPosts(posts) { //with the JSON response data
  * @returns Return the HTML element for displaying the whole post
  */
 
+
 function generatePostTemplate(postTitle, postBody, postUser, postDate){
     // create the container of the post
     var divPostContainer = document.createElement('div');
@@ -76,13 +77,13 @@ function generatePostTemplate(postTitle, postBody, postUser, postDate){
 
     // structure all the post's elements
     divPostContainer.appendChild(divCenter);
-    divPostContainer.appendChild(divPostTitle)
-    divPostContainer.appendChild(divPostBody)
-
     divPostContainer.appendChild(divPostInfo);
 
-    divPostTitle.appendChild(h3PostTitle);
-    divPostBody.appendChild(pPostBody);
+    // divPostTitle.appendChild(h3PostTitle);
+    // divPostBody.appendChild(pPostBody);
+
+    divCenter.appendChild(h3PostTitle);
+    divCenter.appendChild(pPostBody);
 
     divPostInfo.appendChild(divPostUser);
     divPostInfo.appendChild(divPostDate);
@@ -92,8 +93,9 @@ function generatePostTemplate(postTitle, postBody, postUser, postDate){
     
     divCenter.classList.add('container-center')
 
-    divPostTitle.classList.add('postTitle')
-    divPostBody.classList.add('postBody')
+    //add extra divs for css
+    divPostTitle.classlist.add('postTitle')
+    divPostBody.classlist.add('postBody')
 
     divPostUser.classList.add('postUser')
     divPostDate.classList.add('postDate')

@@ -19,9 +19,10 @@ body {
 
 .headerTitle{
     padding: 0px;
-    margin: 0px;
-    font-weight: bold;
+    margin: 20px;
+    font-family: 'Alexandria', sans-serif;
     text-transform: uppercase;
+    font-size: 300%;
     color: #000000;
     /* center the header text */
     text-align: center;
@@ -53,14 +54,18 @@ body {
     background-color: #60cedd;
 }
 
-.left-aligned{
+.postUser{
+    margin-left: 100px;
+    margin-bottom: 10px;
     float: left;
     align-self: center;
     align-content: center;;
 
 }
 
-.right-aligned{
+.postDate{
+    margin-right: 100px;
+    margin-bottom: 10px;
     float: right;
     align-self: center;
     align-content: center;;
@@ -69,16 +74,32 @@ body {
 
 .container-center {
     text-align: center;
-    margin-left: auto;
-    margin-right: auto;
+    margin:10px;
     align-content: center;
     align-items: center;
 
 }
 
 .container-posts{
+    border-style: solid;
+    border-radius: 20px;
+    background-color: rgb(255, 246, 234);
+    margin:20px 100px;
     align-content: center;
     overflow: auto;
+    
+}
+
+.postTitle{
+    text-decoration: underline;
+    font-size: 150%;
+}
+
+.postBody{
+    background-color: white;
+    border-radius: 10px;
+    margin: 10px 100px 20px 100px;
+    padding: 10px 50px;
 }
 
 .post{
@@ -94,4 +115,10 @@ body {
     width: 30%;
     border: 2px rgb(0, 0, 0);
     padding: 10px;
+}
+
+#pageTitle{
+    font-family: 'Alexandria', sans-serif;
+    color:#60cedd;
+    font-size: 200%;
 }

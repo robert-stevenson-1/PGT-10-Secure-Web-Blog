@@ -160,6 +160,22 @@ async function queryDB(query) {
   return data;
 }
 
+//submit new blog post
+app.post('/add-post', (req, res) => {
+  const { title, content } = req.body;
+  const query = 'INSERT INTO posts (title, content) VALUES ($1, $2)';
+  const values = [title, content];
+
+  pool.query(query, values, (error, result) => {
+    if (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    } else {
+      res.redirect('/');
+    }
+  });
+});
+
 module.exports = {
   queryDB,
   getPostsJSON,
