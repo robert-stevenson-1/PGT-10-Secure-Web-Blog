@@ -49,6 +49,8 @@ app.use(bodyParser.json()); // parse application/json
 const pool = new pg.Pool(config.database); // create a new postgresql pool
 // const client = pool.connect(); // create and connect a client to the database
 
+//Temp store for each user's verification code together with the username that is linked to
+let codes = new Map();
 /*
 source: https://blog.logrocket.com/crud-rest-api-node-js-express-postgresql/
 
@@ -189,7 +191,10 @@ app.post('/send_verify_code', async (req, res) => {
         console.log(email);
 
         //todo: send the verification email
-        sendEmail(email, "TestEmail", "This is a test email");
+        sent_code = sendVerificationEmail(email);
+        codes.set(username, sent_code);
+
+        console.log(codes);
       }
     } catch (error) {
       console.log(error.stack);
@@ -330,8 +335,17 @@ app.post("/signup", (req, res) => {
   });
 });
 
-function sendVerificationEmail(email, code){
+/**
+ * send a verification code to the email address
+ * @param {string} email The email address to send the code to
+ * @returns {number} The verification code sent
+*/
+function sendVerificationEmail(email){
+  let code = generateVerificationCode();
+  let email_body = "Verification Code: " + code;
+  sendEmail(email, "BLOGLIFE: Verification Code", email_body);
 
+  return code;
 }
 
 function generateVerificationCode(){
