@@ -37,8 +37,6 @@
       <a href="/" class="nav-button"><h1 class="headerTitle"><b>BLOGLIFE</b></h1></a>
       <!-- Navigation bar with social media icons -->
       <div id="nav-main" class="nav">
-        <!-- <a href="LoginSignup.html" class="nav-button left-aligned"><i class="">Log in</i></a> -->
-        <!-- <a href="LoginSignup.html" class="nav-button left-aligned"><i class="">Sign Up</i></a> -->
         <a href="#" class="nav-button"><i class="fa fa-facebook-official"></i></a>
         <a href="#" class="nav-button"><i class="fa fa-instagram"></i></a>
         <a href="#" class="nav-button"><i class="fa fa-snapchat"></i></a>
@@ -69,8 +67,6 @@
       <!-- Blog entries -->
       <div class="container-posts" id="Posts">
         <div class="container-center">
-          <a href="posts.html" class="nav-button"><h3>Posts</h3></a>
-        
           <h1>Login Page</h1>
           <form id="loginForm">
             <label for="username">Username:</label>
@@ -80,6 +76,23 @@
             <input type="submit" value="Login">
           </form>
           <div id="response"></div>
+          <form id="Signup">
+            <h1>Sign Up</h1>
+            
+            <label for="username"><b>Username</b></label>
+            <input type="text" placeholder="Enter Username" id="usernameinput"  required>
+      
+            <label for="email"><b>Email</b></label>
+            <input type="email" placeholder="Enter Email" id="email" required>
+      
+            <label for="psw"><b>Password</b></label>
+            <input type="password" placeholder="Enter Password" id="psw" required>
+      
+            <label for="psw-repeat"><b>Repeat Password</b></label>
+            <input type="password" placeholder="Repeat Password" id="psw-repeat" required>
+            
+            <button type="submit">Sign Up</button>
+              </form>
         </div>
         <!-- START OF BLOG ENTRIES  -->
         
