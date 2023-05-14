@@ -372,7 +372,3 @@ function logout() {
       });
   }
   
-
-
-
->>>>>>> Stashed changes

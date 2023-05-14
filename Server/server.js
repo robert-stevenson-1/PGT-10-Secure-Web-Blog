@@ -193,12 +193,12 @@ app.post("/login", async (req, res) => {
       } else {
         // If the query returns no rows or more than one row, the user is not authenticated
         res.json({ success: false, message: "Invalid username or password" });
-        console.log("notsuccess");
+        console.log("notsuccess: password");
       }
     } else {
       // If the query returns no rows or more than one row, the user is not authenticated
       res.json({ success: false, message: "Invalid username or password" });
-      console.log("notsuccess");
+      console.log("notsuccess: username");
     }
   } catch (error) {
     console.log(error.stack);
