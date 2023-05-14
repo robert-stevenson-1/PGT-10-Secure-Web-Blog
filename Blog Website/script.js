@@ -5,7 +5,7 @@ const formSearch = document.getElementById("formSearch");
 const inputSearch = document.getElementById("searchBar");
 // const btnSearch = document.getElementById('searchBtn');
 // when ever the search bar is typed in then run event
-inputSearch.addEventListener("keyup", function(event) {
+inputSearch.addEventListener("keyup", function (event) {
     if (event.key === "Enter") {
         console.log(location.href);
         searchPosts();
@@ -16,8 +16,8 @@ inputSearch.addEventListener("keyup", function(event) {
  * On the page load, run...
  */
 async function onload() {
-    console.log('Page loaded');
-    console.log(window.location.href)
+    console.log("Page loaded");
+    console.log(window.location.href);
 
     if (!isLoggedIn()) {
         addLoginSignupButtons();
@@ -26,22 +26,25 @@ async function onload() {
     }
 
     // check if what page we are on
-    if (window.location.href.includes('/posts.html')) { // are we on the posts page
-        console.log('Index page loaded');
+    if (window.location.href.includes("/posts.html")) {
+        // are we on the posts page
+        console.log("Index page loaded");
         // make a GET request for the post in the database on the server
-        fetch('/getPosts',
-            {
-                method: 'GET',
-            }).then(function (response) { //with the response....
+        fetch("/getPosts", {
+            method: "GET",
+        })
+            .then(function (response) {
+                //with the response....
                 console.log("Status: " + response.status);
                 console.log(response);
-                return response.json() // return the JSON of the response
+                return response.json(); // return the JSON of the response
             })
-            .then(data => processPosts(data))
-            .catch(error => console.error(error)); // catch any error and print it out
+            .then((data) => processPosts(data))
+            .catch((error) => console.error(error)); // catch any error and print it out
     }
 
-    if (window.location.href.includes('/Search.html')) { // are we on the search page
+    if (window.location.href.includes("/Search.html")) {
+        // are we on the search page
         // get the search from sessionStorage (ref: https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage)
         let searchResult = sessionStorage.getItem("searchResult");
         //parse the data string from sessionStorage as JSON again
@@ -63,8 +66,8 @@ function processPosts(posts) {
     posts = posts.posts;
     //get the posts container from the DOM
     postsContainer = document.getElementById("Posts");
-    if (!postsContainer){
-        throw new Error('Can not find posts container');
+    if (!postsContainer) {
+        throw new Error("Can not find posts container");
     }
     //TODO: process the response data (Posts) into HTML elements that can be added to our website
     for (var postKey in posts) {
@@ -97,27 +100,30 @@ async function searchPosts() {
         // console.log(JSON.stringify(data));
 
         //written with the aid of: https://www.digitalocean.com/community/tutorials/use-expressjs-to-get-url-and-post-parameters
-        fetch(`/Search?search=${val}`,
-        {
-            method: 'POST',
+        fetch(`/Search?search=${val}`, {
+            method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
-        }).then(function (response) { //with the response....
-            console.log("Status: " + response.status);
-            console.log(response);
-            return response.json() // return the JSON of the response
-        }).then(function(data){
-            // store the search results in session storage so that we can use it in the search.html page
-            // Reference: https://www.w3schools.com/HTML/html5_webstorage.asp
-            console.log(data);
-            //store the JSON data as a string in sessionStorage
-            sessionStorage.setItem("searchResult", JSON.stringify(data));
-        }).then(function(){
-            // redirect to search page
-            window.location.href = '/Search.html';
         })
-        .catch(error => console.error(error)); // catch any error and print it out
+            .then(function (response) {
+                //with the response....
+                console.log("Status: " + response.status);
+                console.log(response);
+                return response.json(); // return the JSON of the response
+            })
+            .then(function (data) {
+                // store the search results in session storage so that we can use it in the search.html page
+                // Reference: https://www.w3schools.com/HTML/html5_webstorage.asp
+                console.log(data);
+                //store the JSON data as a string in sessionStorage
+                sessionStorage.setItem("searchResult", JSON.stringify(data));
+            })
+            .then(function () {
+                // redirect to search page
+                window.location.href = "/Search.html";
+            })
+            .catch((error) => console.error(error)); // catch any error and print it out
     }
 }
 
@@ -267,108 +273,196 @@ function addLoginSignupButtons() {
 //     mainNav.appendChild(btnViewPost);
 // }
 
-// Logın form code:
 
-const form = document.getElementById('loginForm');
-const usernameInput = document.querySelector('#username');
-const passwordInput = document.querySelector('#password');
 
-const usernameDiv = document.getElementById('username');
 
-form.addEventListener('submit', async (event) => {
+// Login code:
+
+let waitForVerifyResolve;
+let boolVerified = false;
+
+const form = document.getElementById("loginForm");
+const usernameInput = document.querySelector("#username");
+const passwordInput = document.querySelector("#password");
+
+const usernameDiv = document.getElementById("username");
+
+form.addEventListener("submit", async (event) => {
     event.preventDefault();
     const username = usernameInput.value;
     const password = passwordInput.value;
-    const responseDiv = document.getElementById('response');
+    const responseDiv = document.getElementById("response");
     console.log(responseDiv);
-    const response = await fetch('/login', {
-        method: 'POST',
+
+    // show the popup for the code and wait for the user to provide the verification code code
+    // method inspiration: https://stackoverflow.com/questions/65915371/how-do-i-make-the-program-wait-for-a-button-click-to-go-to-the-next-loop-iterati
+    await showCodePopup();
+    // wait for the verification popup for to be completed or closed
+    await waitForVerify();
+
+    if (!boolVerified) {
+        console.log("NOT Verified, POST login");
+        // Display an error message for failed login
+        const error = document.querySelector("#error");
+        responseDiv.innerText = "Wrong username or password.";
+        return;
+    }
+
+    console.log("Verfied, POST login");
+
+    const response = await fetch("/login", {
+        method: "POST",
         headers: {
-            'Content-Type': 'application/json'
+            "Content-Type": "application/json",
         },
-        body: JSON.stringify({ username, password })
-    })
-        .then(response => response.json())
-        .then(data => {
+        body: JSON.stringify({ username, password }),
+        })
+        .then((response) => response.json())
+        .then((data) => {
             if (data.success) {
                 // Redirect to the home page
-                window.location.href = '/posts.html';
-                responseDiv.innerText = 'Login successful!';
+                window.location.href = "/posts.html";
+                responseDiv.innerText = "Login successful!";
             } else {
                 // Display an error message
-                const error = document.querySelector('#error');
-                responseDiv.innerText = 'Wrong username or password.';
+                const error = document.querySelector("#error");
+                responseDiv.innerText = "Wrong username or password.";
                 error.textContent = data.message;
             }
         })
-        .catch(error => console.error(error));
+        .catch((error) => console.error(error));
 });
 
-//signup form code 
-const signupForm = document.getElementById('Signup');
-const signupUsernameInput = document.querySelector('#usernameinput');
-const signupPasswordInput = document.querySelector('#psw');
-const signupRepeatPasswordInput = document.querySelector('#psw-repeat');
-const signupEmail = document.querySelector('#email');
+// LOGIN 2FA
 
-signupForm.addEventListener('submit', async (event) => {
-    console.log('neredeyiz',signupPasswordInput.value,signupRepeatPasswordInput.value)
+let btnCodeSubmit;
+let btnCodeClose;
+
+function waitForVerify() {
+    return new Promise(resolve => waitForVerifyResolve = resolve);
+}
+
+async function showCodePopup() {
+    await drawCodePopup();
+    btnCodeSubmit = document.getElementById("btnCodeSubmit");
+    btnCodeClose = document.getElementById("btnCodeClose");
+
+    // set the submit code event on the click
+    btnCodeSubmit.addEventListener("click", verifyCode)
+    // set the close code event on the click
+    btnCodeClose.addEventListener("click", closeCodePopup);
+
+    document.getElementById("validationCodePopup").style.display = "Block";
+    //wait for the popup to submitted or closed
+    
+}
+
+function verifyCode(){
+    console.log("Verified");
+    boolVerified = true;
+    document.getElementById("valCodePopup").remove(); // remove the popup form
+    
+    // do what need to be done before resolving the wait promise
+    if (waitForVerifyResolve) waitForVerifyResolve(); // resolve the promise
+}
+
+function closeCodePopup() {
+    console.log("closeCodePopup");
+
+    boolVerified = false;    
+    
+    document.getElementById("valCodePopup").remove(); // remove the popup form
+    
+    // do what need to be done before resolving the wait promise
+    if (waitForVerifyResolve) waitForVerifyResolve(); // resolve the promise
+}
+
+function drawCodePopup() {
+    let popupDiv = document.createElement("div");
+    popupDiv.classList.add("valCodePopup");
+    popupDiv.id = "valCodePopup";
+
+    popupDiv.innerHTML = "<div class=\"formPopup\" id=\"validationCodePopup\"><form class=\"formContainer\"><h2>Validation code</h2><label for=\"code\"><strong>Code:</strong></label><input type=\"text\" id=\"code\" name=\"code\" required><button type=\"button\" class=\"btn\" id=\"btnCodeSubmit\">Submit</button><button type=\"button\" class=\"btn cancel\" id=\"btnCodeClose\">Close</button></form></div>";
+
+    document.getElementById("main").append(popupDiv);  
+
+    btnCodeSubmit = document.getElementById("btnCodeSubmit");
+    btnCodeClose = document.getElementById("btnCodeClose");
+}
+
+function hideCodePopup() {
+    document.getElementById("validationCodePopup").style.display = "none";
+}
+
+//signup form code
+const signupForm = document.getElementById("Signup");
+const signupUsernameInput = document.querySelector("#usernameinput");
+const signupPasswordInput = document.querySelector("#psw");
+const signupRepeatPasswordInput = document.querySelector("#psw-repeat");
+const signupEmail = document.querySelector("#email");
+
+signupForm.addEventListener("submit", async (event) => {
+    console.log(
+        "neredeyiz",
+        signupPasswordInput.value,
+        signupRepeatPasswordInput.value
+    );
     event.preventDefault();
     const username = signupUsernameInput.value;
     const password = signupPasswordInput.value;
     const repeatpassword = signupRepeatPasswordInput.value;
-    const email= signupEmail.value;
+    const email = signupEmail.value;
     const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
-    const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+-={[}\]|\\:;"'<,>.?/])(?!.*\s).{8,}$/;
+    const passwordRegex =
+        /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+-={[}\]|\\:;"'<,>.?/])(?!.*\s).{8,}$/;
     if (!emailRegex.test(email)) {
-      console.log('Invalid email address');
-      return
+        console.log("Invalid email address");
+        return;
     }
     if (!passwordRegex.test(password)) {
-        console.log('Invalid password ');
-        return
-      }
-    if (password !== repeatpassword){
-        console.log("Password doesn't match")
-        return
+        console.log("Invalid password ");
+        return;
     }
-    const responseDiv = document.getElementById('response');
+    if (password !== repeatpassword) {
+        console.log("Password doesn't match");
+        return;
+    }
+    const responseDiv = document.getElementById("response");
     console.log(responseDiv);
-    const response = await fetch('/signup', {
-        method: 'POST',
+    const response = await fetch("/signup", {
+        method: "POST",
         headers: {
-            'Content-Type': 'application/json'
+            "Content-Type": "application/json",
         },
-        body: JSON.stringify({ username, password, email })
-    })
-        .then(response => response.json())
-        .then(data => {
+        body: JSON.stringify({ username, password, email }),
+        })
+        .then((response) => response.json())
+        .then((data) => {
             if (data.success) {
                 // Redirect to the home page
-                window.location.href = '/posts.html';
-                responseDiv.innerText = 'Signup successful!';
+                window.location.href = "/posts.html";
+                responseDiv.innerText = "Signup successful!";
             } else {
                 // Display an error message
-                const error = document.querySelector('#error');
+                const error = document.querySelector("#error");
                 error.textContent = data.message;
             }
         })
-        .catch(error => console.error(error));
+        .catch((error) => console.error(error));
 });
 
 function logout() {
-    fetch('/logout', { method: 'POST' })
-      .then(response => {
-        if (response.ok) {
-          alert('Successful logged out!');
-          location.reload();
-        } else {
-          alert('An error occurs while logging out!');
-        }
-      })
-      .catch(error => {
-        console.log(error);
-        alert('An error occurs while logging out!');
-      });
-  }
-  
+    fetch("/logout", { method: "POST" })
+        .then((response) => {
+            if (response.ok) {
+                alert("Successful logged out!");
+                location.reload();
+            } else {
+                alert("An error occurs while logging out!");
+            }
+        })
+        .catch((error) => {
+            console.log(error);
+            alert("An error occurs while logging out!");
+        });
+}
