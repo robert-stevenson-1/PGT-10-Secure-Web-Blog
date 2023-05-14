@@ -62,11 +62,70 @@ app.listen(port, () => {
 //get the posts for the database and display them on the main page of the site
 app.get("/getPosts", async (req, res) => {
   // console.log("Getting posts for database and sending them to be displayed");
-
   posts = await getPostsJSON();
-
   // send the posts to add to the site in the post container
   res.send(posts);
+});
+
+app.post('/Search', async (req, res) => {
+  // To Secure against SQL injection:
+  //  - Use parameterized queries (https://node-postgres.com/features/queries#Parameterized%20query)
+  //    - node-postgres supports parameterized queries, passing your query text unaltered as well 
+  //      as your parameters to the PostgreSQL server where the parameters are safely substituted 
+  //      into the query with battle-tested parameter substitution code within the server itself 
+  
+  // url param pass aid: https://www.digitalocean.com/community/tutorials/use-expressjs-to-get-url-and-post-parameters
+  params = [
+    '%'+req.query.search+'%' // Wrap the parameter in % wildcards for pattern recognition in WHERE ... LIKE query
+  ];
+  console.log(params);
+
+  data = {};
+  //create a client to interact with the database
+  const client = await pool.connect(); // create and connect a client to the database
+  //try to get the data from the database
+  try {
+    // Create send the query with db with the parameter values and read request from the database
+    dbResult = await client.query(dbQueries.SEARCH_POSTS, params);
+    // console.log(data)
+    console.log(dbResult.rows)
+
+    //create a JSON object for posts info to send to the frontend as a response for processing and displaying
+    const postToAdd = {
+      //TEST DATA
+      posts: [],
+    };
+
+    // add each posts info to the JSON to return
+    for (var key in dbResult.rows) {
+      if (dbResult.rows.hasOwnProperty(key)) {
+        var rowJSON = dbResult.rows[key];
+        //convert the SQL timestamp format to dd/mm/yyyy date format
+        tempDate = new Date(rowJSON.created_at).toLocaleDateString("en-GB");
+
+        postJSON = {
+          user: rowJSON.username,
+          postTitle: rowJSON.title,
+          postBody: rowJSON.content,
+          datePost: tempDate,
+        };
+        postToAdd.posts.push(postJSON);
+      }
+    }
+    //send the data back
+    res.send(postToAdd);
+
+  }catch (error){
+    console.log(error.stack);
+  } finally {
+    client.end((err) => {
+      // source: https://node-postgres.com/apis/client#clientend
+      console.log("client has disconnected");
+      if (err) {
+        console.log("error during disconnection", err.stack);
+      }
+    });
+  }
 });
 
 async function getPostsJSON() {
@@ -158,7 +217,7 @@ async function queryDB(query) {
   }
 
   return data;
-}
+};
 
 //submit new blog post
 app.post('/add-post', (req, res) => {

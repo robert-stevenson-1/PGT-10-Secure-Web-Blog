@@ -4,6 +4,7 @@
 
 // get all the posts from the database
 const GET_ALL_POSTS = 'SELECT accounts.username, posts.title, posts.content, posts.created_at FROM posts, accounts WHERE posts.account_id = accounts.ID';
+const SEARCH_POSTS = 'SELECT accounts.username, posts.title, posts.content, posts.created_at FROM posts, accounts WHERE posts.account_id = accounts.ID AND (posts.title LIKE $1 OR posts.content LIKE $1)';
 // get all the posts from the database for a specific user
 const GET_A_USERS_POSTS = 'SELECT accounts.username, posts.title, posts.content, posts.created_at FROM posts, accounts WHERE posts.account_id = accounts.ID and accounts.ID == $1';
 //look for user who has a matching Username and password
@@ -16,5 +17,6 @@ module.exports = {
     GET_ALL_POSTS,
     GET_USER,
     USER_EXIST,
-    GET_A_USERS_POSTS
+    GET_A_USERS_POSTS,
+    SEARCH_POSTS
 }
