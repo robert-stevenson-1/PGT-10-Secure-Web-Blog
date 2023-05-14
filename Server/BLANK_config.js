@@ -14,6 +14,7 @@ var config = {
     },
     gmail: {
         host: 'smtp.gmail.com',
+        service: 'Gmail',
         port: 587,
         auth: {
             user: "email@example.com", // The email address
