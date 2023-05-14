@@ -11,6 +11,18 @@ var config = {
     site: {
         path: '../Blog Website', // The path to the website static folder (Convention suggest that this usually in a folder named 'public)
         port: 3000, // The port that the hosted site is on
+    },
+    gmail: {
+        host: 'smtp.gmail.com',
+        port: 587,
+        auth: {
+            user: "email@example.com", // The email address
+            /*
+            Setting nodemailer up to use gmail:
+            - https://stackoverflow.com/questions/71477637/nodemailer-and-gmail-after-may-30-2022
+            */
+            pass: "passwordhere", // The password for the email address
+        }
     }
 };
 

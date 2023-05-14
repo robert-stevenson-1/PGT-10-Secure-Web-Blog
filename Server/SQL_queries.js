@@ -11,6 +11,7 @@ const GET_A_USERS_POSTS = 'SELECT accounts.username, posts.title, posts.content,
 const GET_USER = 'SELECT id, username, email FROM accounts WHERE username = $1 AND password = $2';
 // check if the a user exists in the database. Returns 1 is user exists and 0 is they don't exist.
 const USER_EXIST = 'SELECT COUNT(*) FROM accounts WHERE username = $1 AND password = $2';
+const GET_USER_EMAIL = 'SELECT accounts.email FROM accounts WHERE username = $1';
 
 
 module.exports = {
@@ -18,5 +19,6 @@ module.exports = {
     GET_USER,
     USER_EXIST,
     GET_A_USERS_POSTS,
-    SEARCH_POSTS
+    SEARCH_POSTS,
+    GET_USER_EMAIL
 }

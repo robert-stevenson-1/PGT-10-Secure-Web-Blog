@@ -5,6 +5,10 @@ install links for requires software and tools:
 - Express: https://expressjs.com/en/
 - pg module: https://www.npmjs.com/package/pg
 - body parser module: https://www.npmjs.com/package/body-parser
+- nodemailer module: npm install nodemailer
+
+Setting nodemailer up to use gmail:
+- https://stackoverflow.com/questions/71477637/nodemailer-and-gmail-after-may-30-2022
 
 /*
 TODO:
@@ -29,6 +33,11 @@ const bcrypt = require("bcrypt");
 const dbQueries = require("./SQL_queries.js"); // import the SQL queries that we will use regularly
 const config = require("./config.js"); // import the config file
 const cookieParser = require("cookie-parser");
+const nodemailer = require("nodemailer");
+//setup the mail transporter
+const transporter = nodemailer.createTransport(config.gmail);
+//try to connect with the server and show the connection info (prints 'true') when the execution gets success, and error when the execution gets fail
+transporter.verify().then(console.log).catch(console.error);
 
 //setup the express server app
 const port = config.site.port; // set the port
@@ -160,6 +169,41 @@ async function getPostsJSON() {
 
 const SESSIONS = new Map();
 
+app.post('/send_verify_code', async (req, res) => {
+  const {username} = req.body; // get the username
+  const client = await pool.connect(); // create and connect a client to the database
+  
+  try{
+      // Query the database for the user's email with the given username
+      params = [
+        username
+      ];
+      // Create send the query with db with the parameter values and read request from the database
+      dbResult = await client.query(dbQueries.GET_USER_EMAIL, params);
+      
+      // make sure that we only get one email address back
+      if (dbResult.rows.length != 1) {
+        res.json({ success: false, message: "Invalid username or password" })
+      }else{
+        let email = dbResult.rows[0]["email"];
+        console.log(email);
+
+        //todo: send the verification email
+        sendEmail(email, "TestEmail", "This is a test email");
+      }
+    } catch (error) {
+      console.log(error.stack);
+    } finally {
+      client.end((err) => {
+        // source: https://node-postgres.com/apis/client#clientend
+        console.log("client has disconnected");
+        if (err) {
+          console.log("error during disconnection", err.stack);
+        }
+      });
+    }
+});
+
 app.post("/login", async (req, res) => {
   const { username, password } = req.body;
 
@@ -285,6 +329,27 @@ app.post("/signup", (req, res) => {
     });
   });
 });
+
+function sendVerificationEmail(email, code){
+
+}
+
+function generateVerificationCode(){
+  //TODO: generate 6 digit verification code
+  return 123456;
+}
+
+function sendEmail(to_, subject_, message_){
+    transporter.sendMail({
+      from: config.gmail.auth.user,
+      to: to_,
+      subject: subject_,
+      text: message_,
+      html: "",
+    }).then(info => {
+      console.log({info});
+    }).catch(console.error);
+}
 
 const crypto = require("crypto");
 const { strict } = require("assert");

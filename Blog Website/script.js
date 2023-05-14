@@ -297,6 +297,21 @@ form.addEventListener("submit", async (event) => {
     // show the popup for the code and wait for the user to provide the verification code code
     // method inspiration: https://stackoverflow.com/questions/65915371/how-do-i-make-the-program-wait-for-a-button-click-to-go-to-the-next-loop-iterati
     await showCodePopup();
+    // request a verification to be sent via email
+    const ver_resp = await fetch("/send_verify_code",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({username
+}),
+        })
+        .then((response) => response.json())
+        .then((data) => {
+            console.log(data);
+        });
+
     // wait for the verification popup for to be completed or closed
     await waitForVerify();
 
@@ -308,7 +323,7 @@ form.addEventListener("submit", async (event) => {
         return;
     }
 
-    console.log("Verfied, POST login");
+    console.log("Verified, POST login");
 
     const response = await fetch("/login", {
         method: "POST",
@@ -353,15 +368,14 @@ async function showCodePopup() {
     btnCodeClose.addEventListener("click", closeCodePopup);
 
     document.getElementById("validationCodePopup").style.display = "Block";
-    //wait for the popup to submitted or closed
-    
 }
 
 function verifyCode(){
-    console.log("Verified");
     boolVerified = true;
+
+    //TODO: send the code entered to the server to verify with.
+
     document.getElementById("valCodePopup").remove(); // remove the popup form
-    
     // do what need to be done before resolving the wait promise
     if (waitForVerifyResolve) waitForVerifyResolve(); // resolve the promise
 }
