@@ -233,39 +233,39 @@ function addLoginSignupButtons() {
     btnLogin.classList.add("nav-button");
     btnLogin.classList.add("left-aligned");
 
-    btnSignup = document.createElement("a");
-    btnSignupContent = document.createElement("i");
-    btnSignup.appendChild(btnSignupContent);
-    btnSignupContent.textContent = "Sign Up";
-    btnSignup.href = "signup.html";
-    btnSignup.classList.add("nav-button");
-    btnSignup.classList.add("left-aligned");
+    // btnSignup = document.createElement("a");
+    // btnSignupContent = document.createElement("i");
+    // btnSignup.appendChild(btnSignupContent);
+    // btnSignupContent.textContent = "Sign Up";
+    // btnSignup.href = "signup.html";
+    // btnSignup.classList.add("nav-button");
+    // btnSignup.classList.add("left-aligned");
 
-    mainNav.appendChild(btnLogin);
-    mainNav.appendChild(btnSignup);
+    // mainNav.appendChild(btnLogin);
+    // mainNav.appendChild(btnSignup);
 }
 
-function addExtraNav() {
-    mainNav = document.getElementById("nav-main");
+// function addExtraNav() {
+//     mainNav = document.getElementById("nav-main");
 
-    btnLogOut = document.createElement("a");
-    btnLogOutContent = document.createElement("i");
-    btnLogOut.appendChild(btnLogOutContent);
-    btnLogOutContent.textContent = "Log in";
-    btnLogOut.href = "LoginSignup.html";
-    btnLogOut.classList.add("nav-button");
-    btnLogOut.classList.add("left-aligned");
+//     btnLogOut = document.createElement("a");
+//     btnLogOutContent = document.createElement("i");
+//     btnLogOut.appendChild(btnLogOutContent);
+//     btnLogOutContent.textContent = "Log in";
+//     btnLogOut.href = "LoginSignup.html";
+//     btnLogOut.classList.add("nav-button");
+//     btnLogOut.classList.add("left-aligned");
 
-    btnViewPost = document.createElement("a");
-    btnViewPostContent = document.createElement("i");
-    btnViewPost.appendChild(btnViewPostContent);
-    btnViewPostContent.textContent = "View Posts";
-    btnViewPost.href = "posts.html";
-    btnViewPost.classList.add("nav-button");
-    btnViewPost.classList.add("left-aligned");
+//     btnViewPost = document.createElement("a");
+//     btnViewPostContent = document.createElement("i");
+//     btnViewPost.appendChild(btnViewPostContent);
+//     btnViewPostContent.textContent = "View Posts";
+//     btnViewPost.href = "posts.html";
+//     btnViewPost.classList.add("nav-button");
+//     btnViewPost.classList.add("left-aligned");
 
-    mainNav.appendChild(btnViewPost);
-}
+//     mainNav.appendChild(btnViewPost);
+// }
 
 // Logın form code:
 
@@ -273,9 +273,10 @@ const form = document.getElementById('loginForm');
 const usernameInput = document.querySelector('#username');
 const passwordInput = document.querySelector('#password');
 
+const usernameDiv = document.getElementById('username');
+
 form.addEventListener('submit', async (event) => {
     event.preventDefault();
-
     const username = usernameInput.value;
     const password = passwordInput.value;
     const responseDiv = document.getElementById('response');
@@ -302,3 +303,76 @@ form.addEventListener('submit', async (event) => {
         })
         .catch(error => console.error(error));
 });
+
+//signup form code 
+const signupForm = document.getElementById('Signup');
+const signupUsernameInput = document.querySelector('#usernameinput');
+const signupPasswordInput = document.querySelector('#psw');
+const signupRepeatPasswordInput = document.querySelector('#psw-repeat');
+const signupEmail = document.querySelector('#email');
+
+signupForm.addEventListener('submit', async (event) => {
+    console.log('neredeyiz',signupPasswordInput.value,signupRepeatPasswordInput.value)
+    event.preventDefault();
+    const username = signupUsernameInput.value;
+    const password = signupPasswordInput.value;
+    const repeatpassword = signupRepeatPasswordInput.value;
+    const email= signupEmail.value;
+    const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+    const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+-={[}\]|\\:;"'<,>.?/])(?!.*\s).{8,}$/;
+    if (!emailRegex.test(email)) {
+      console.log('Invalid email address');
+      return
+    }
+    if (!passwordRegex.test(password)) {
+        console.log('Invalid password ');
+        return
+      }
+    if (password !== repeatpassword){
+        console.log("Password doesn't match")
+        return
+    }
+    const responseDiv = document.getElementById('response');
+    console.log(responseDiv);
+    const response = await fetch('/signup', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ username, password, email })
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Redirect to the home page
+                window.location.href = '/posts.html';
+                responseDiv.innerText = 'Signup successful!';
+            } else {
+                // Display an error message
+                const error = document.querySelector('#error');
+                error.textContent = data.message;
+            }
+        })
+        .catch(error => console.error(error));
+});
+
+function logout() {
+    fetch('/logout', { method: 'POST' })
+      .then(response => {
+        if (response.ok) {
+          alert('Successful logged out!');
+          location.reload();
+        } else {
+          alert('An error occurs while logging out!');
+        }
+      })
+      .catch(error => {
+        console.log(error);
+        alert('An error occurs while logging out!');
+      });
+  }
+  
+
+
+
+>>>>>>> Stashed changes
