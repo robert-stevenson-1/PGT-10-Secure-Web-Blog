@@ -25,9 +25,10 @@ const express = require("express"); // import express module
 const bodyParser = require("body-parser"); // import body-parser
 const pg = require("pg"); // import the postgresql module
 const path = require("path"); // import the path module
-
+const bcrypt = require("bcrypt");
 const dbQueries = require("./SQL_queries.js"); // import the SQL queries that we will use regularly
 const config = require("./config.js"); // import the config file
+const cookieParser = require("cookie-parser");
 
 //setup the express server app
 const port = config.site.port; // set the port
@@ -67,16 +68,16 @@ app.get("/getPosts", async (req, res) => {
   res.send(posts);
 });
 
-app.post('/Search', async (req, res) => {
+app.post("/Search", async (req, res) => {
   // To Secure against SQL injection:
   //  - Use parameterized queries (https://node-postgres.com/features/queries#Parameterized%20query)
-  //    - node-postgres supports parameterized queries, passing your query text unaltered as well 
-  //      as your parameters to the PostgreSQL server where the parameters are safely substituted 
-  //      into the query with battle-tested parameter substitution code within the server itself 
-  
+  //    - node-postgres supports parameterized queries, passing your query text unaltered as well
+  //      as your parameters to the PostgreSQL server where the parameters are safely substituted
+  //      into the query with battle-tested parameter substitution code within the server itself
+
   // url param pass aid: https://www.digitalocean.com/community/tutorials/use-expressjs-to-get-url-and-post-parameters
   params = [
-    '%'+req.query.search+'%' // Wrap the parameter in % wildcards for pattern recognition in WHERE ... LIKE query
+    "%" + req.query.search + "%", // Wrap the parameter in % wildcards for pattern recognition in WHERE ... LIKE query
   ];
   console.log(params);
 
@@ -88,7 +89,7 @@ app.post('/Search', async (req, res) => {
     // Create send the query with db with the parameter values and read request from the database
     dbResult = await client.query(dbQueries.SEARCH_POSTS, params);
     // console.log(data)
-    console.log(dbResult.rows)
+    console.log(dbResult.rows);
 
     //create a JSON object for posts info to send to the frontend as a response for processing and displaying
     const postToAdd = {
@@ -114,8 +115,7 @@ app.post('/Search', async (req, res) => {
     }
     //send the data back
     res.send(postToAdd);
-
-  }catch (error){
+  } catch (error) {
     console.log(error.stack);
   } finally {
     client.end((err) => {
@@ -158,42 +158,161 @@ async function getPostsJSON() {
   return postToAdd;
 }
 
-app.post('/login', (req, res) => {
+const SESSIONS = new Map();
+
+app.post("/login", async (req, res) => {
   const { username, password } = req.body;
+
+  try {
+    // Connect to the database using the configuration options
+    const pool = new pg.Pool(config.database);
+
+    // Query the database for the user with the given username and password
+    const query = "SELECT * FROM accounts WHERE username = $1 ";
+    const values = [username];
+
+    const result = await pool.query(query, values);
+
+    if (result.rows.length === 1) {
+      // If the query returns exactly one row, the user is authenticated
+      const user = result.rows[0];
+      const isPasswordMatch = await bcrypt.compare(password, user.password);
+      if (isPasswordMatch) {
+        createSession(username);
+
+        const sessionID = crypto.randomUUID();
+        SESSIONS.set(sessionID, username);
+        res.cookie("sessionId", sessionID, {
+          secure: true,
+          httpOnly: true,
+          sameSite: "strict",
+        });
+        res.json({ success: true });
+        console.table(Array.from(SESSIONS));
+        console.log("success");
+      } else {
+        // If the query returns no rows or more than one row, the user is not authenticated
+        res.json({ success: false, message: "Invalid username or password" });
+        console.log("notsuccess");
+      }
+    } else {
+      // If the query returns no rows or more than one row, the user is not authenticated
+      res.json({ success: false, message: "Invalid username or password" });
+      console.log("notsuccess");
+    }
+  } catch (error) {
+    console.log(error.stack);
+  }
+});
+
+app.post("/logout", (req, res) => {
+  const sessionId = res.cookie("sessionId");
+  res.clearCookie("sessionId");
+
+  SESSIONS.delete(sessionId);
+  Array.from(SESSIONS).pop();
+  console.table(Array.from(SESSIONS));
+  res.redirect("/Index.html");
+});
+
+app.post("/signup", (req, res) => {
+  const { username, password, email } = req.body;
 
   // Connect to the database using the configuration options
   const pool = new pg.Pool(config.database);
+  console.log({ username, password, email });
+
+  // Query the database for the user with the given username and password
+  const fetchQuery = "SELECT * FROM accounts WHERE username = $1 OR email=$2";
+  const fetchValues = [username, email];
+
   pool.connect((err, client, done) => {
+    if (err) {
+      console.error("Error connecting to database", err);
+      res
+        .status(500)
+        .json({ success: false, message: "Internal server error" });
+      return;
+    }
+    client.query(fetchQuery, fetchValues, (err, result) => {
       if (err) {
-          console.error('Error connecting to database', err);
-          res.status(500).json({ success: false, message: 'Internal server error' });
-          return;
+        console.error("Error querying database", err);
+        res
+          .status(500)
+          .json({ success: false, message: "Internal server error" });
+        done();
+        return;
+      }
+      if (result.rows.length > 0) {
+        // If the query returns exactly one row, the user is authenticated
+        res.json({ success: false, message: "email already exist" });
+        done();
+        return;
+      }
+    });
+    const saltValue = 10;
+
+    bcrypt.genSalt(saltValue, (err, salt) => {
+      if (err) {
+        console.error("Error generating salt", err);
+        return;
       }
 
-      // Query the database for the user with the given username and password
-      const query = 'SELECT * FROM accounts WHERE username = $1 AND password = $2';
-      const values = [username, password];
-      client.query(query, values, (err, result) => {
-          done(); // Release the client back to the pool
+      bcrypt.hash(password, salt, (err, hashedPassword) => {
+        if (err) {
+          console.error("Error hashing password", err);
+          return;
+        }
 
+        const insertQuery =
+          "INSERT INTO accounts(username, password, email) VALUES ($1, $2, $3) RETURNING id;";
+        const insertValues = [username, hashedPassword, email];
+        client.query(insertQuery, insertValues, (err, result) => {
           if (err) {
-              console.error('Error querying database', err);
-              res.status(500).json({ success: false, message: 'Internal server error' });
-              return;
+            console.error("Error querying database", err);
+            res
+              .status(500)
+              .json({ success: false, message: "Internal server error" });
+            done();
+            return;
           }
 
-          if (result.rows.length === 1) {
-              // If the query returns exactly one row, the user is authenticated
-              res.json({ success: true });
-              console.log("success");
-          } else {
-              // If the query returns no rows or more than one row, the user is not authenticated
-              res.json({ success: false, message: 'Invalid username or password' });
-              console.log("notsuccess");
-          }
+          res.json({ success: true, message: "Signup is successful" });
+
+          done();
+        });
       });
+    });
   });
 });
+
+const crypto = require("crypto");
+const { strict } = require("assert");
+
+function generateToken(length) {
+  return crypto
+    .randomBytes(Math.ceil(length / 2))
+    .toString("hex") // convert to hexadecimal format
+    .slice(0, length); // return the required number of characters
+}
+
+async function createSession(username) {
+  const pool = new pg.Pool(config.database);
+  const token = generateToken(32);
+  const sessionQuery =
+    "INSERT INTO sessioninfo(username,token) VALUES ($1,$2) RETURNING sessionid;";
+  const sessionValues = [username, token];
+
+  try {
+    const client = await pool.connect();
+    const result = await client.query(sessionQuery, sessionValues);
+    client.release();
+    return { success: true, message: "Session is successful" };
+  } catch (err) {
+    console.error("Error querying database", err);
+    return { success: false, message: "Internal server error" };
+  }
+}
 
 async function queryDB(query) {
   data = {};
@@ -217,7 +336,7 @@ async function queryDB(query) {
   }
 
   return data;
-};
+}
 
 module.exports = {
   queryDB,
