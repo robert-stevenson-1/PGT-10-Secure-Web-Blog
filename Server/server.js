@@ -188,13 +188,10 @@ app.post('/send_verify_code', async (req, res) => {
         res.json({ success: false, message: "Invalid username or password" })
       }else{
         let email = dbResult.rows[0]["email"];
-        console.log(email);
 
         //todo: send the verification email
         sent_code = sendVerificationEmail(email);
         codes.set(username, sent_code);
-
-        console.log(codes);
       }
     } catch (error) {
       console.log(error.stack);
