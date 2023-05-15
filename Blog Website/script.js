@@ -1,17 +1,6 @@
 // === set the events ===
 window.onload = onload();
 
-const formSearch = document.getElementById("formSearch");
-const inputSearch = document.getElementById("searchBar");
-// const btnSearch = document.getElementById('searchBtn');
-// when ever the search bar is typed in then run event
-inputSearch.addEventListener("keyup", function(event) {
-    if (event.key === "Enter") {
-        console.log(location.href);
-        searchPosts();
-    }
-});
-
 /**
  * On the page load, run...
  */
@@ -274,11 +263,43 @@ function addExtraNav() {
     mainNav.appendChild(btnViewPost);
 }
 
-// Logın form code:
+const formBlogPost = document.getElementById('newBlogPost');
+const postTitle = document.getElementById("postTitle");
+const  postContent = document.getElementById("postContent");
 
-const form = document.getElementById('loginForm');
-const usernameInput = document.querySelector('#username');
-const passwordInput = document.querySelector('#password');
+formBlogPost.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    console.log("test")
+
+    const blogTitle = postTitle.value;
+    const blogContent = postContent.value;
+    const responseDiv = document.getElementById('response');
+
+    console.log(responseDiv);
+
+    const response = await fetch('/addpost', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ blogTitle, blogContent })
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Redirect to the home page
+                window.location.href = '/posts.html';
+    
+            } else {
+                // Display an error message
+                const error = document.querySelector('#error');
+                responseDiv.innerText = 'Unsuccessful';
+                error.textContent = data.message;
+            }
+        })
+        .catch(error => console.error(error));
+});
+
 
 form.addEventListener('submit', async (event) => {
     event.preventDefault();
