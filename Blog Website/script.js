@@ -1,15 +1,19 @@
 // === set the events ===
 window.onload = onload();
 
-const formSearch = document.getElementById("formSearch");
 const inputSearch = document.getElementById("searchBar");
 // const btnSearch = document.getElementById('searchBtn');
 if (inputSearch != null){
     // when ever the search bar is typed in then run event
     inputSearch.addEventListener("keyup", function (event) {
+        event.preventDefault();
         if (event.key === "Enter") {
             console.log(location.href);
-            searchPosts();
+            let boolSearchRedirect = searchPosts();
+            if (boolSearchRedirect == true){
+                // redirect to search page
+                window.location.href = "/Search.html";
+            }
         }
     });
 }
@@ -96,10 +100,8 @@ async function searchPosts() {
         // trim makes sure to cut off any tailing whitespace
         val = val.trim(); // trim the tailing whitespace
         val = val.toLowerCase(); // reduce all the characters to lowercase representation where possible
-        // data = {
-        //     "search": val,
-        // };
-        // console.log(JSON.stringify(data));
+
+        let boolSearchRedirect = false;
 
         //written with the aid of: https://www.digitalocean.com/community/tutorials/use-expressjs-to-get-url-and-post-parameters
         fetch(`/Search?search=${val}`, {
@@ -115,17 +117,26 @@ async function searchPosts() {
                 return response.json(); // return the JSON of the response
             })
             .then(function (data) {
-                // store the search results in session storage so that we can use it in the search.html page
-                // Reference: https://www.w3schools.com/HTML/html5_webstorage.asp
-                console.log(data);
-                //store the JSON data as a string in sessionStorage
-                sessionStorage.setItem("searchResult", JSON.stringify(data));
-            })
-            .then(function () {
-                // redirect to search page
-                window.location.href = "/Search.html";
+                //check if the are successful, and if true then carry on, else do nothing
+                if (data.success){
+                    // store the search results in session storage so that we can use it in the search.html page
+                    // Reference: https://www.w3schools.com/HTML/html5_webstorage.asp
+                    console.log(data);
+                    //store the JSON data as a string in sessionStorage
+                    sessionStorage.setItem("searchResult", JSON.stringify(data));
+                    
+                    // signal we are ok to redirect to the search result page
+                    boolSearchRedirect = true;
+                }
+                return false;
             })
             .catch((error) => console.error(error)); // catch any error and print it out
+            
+            return boolSearchRedirect;
+        // if (boolSearchRedirect == true){
+        //     // redirect to search page
+        //     window.location.href = "/Search.html";
+        // }
     }
 }
 
@@ -290,68 +301,69 @@ const usernameInput = document.querySelector("#username");
 const passwordInput = document.querySelector("#password");
 
 const usernameDiv = document.getElementById("username");
-
-form.addEventListener("submit", async (event) => {
-    event.preventDefault();
-    const username = usernameInput.value;
-    const password = passwordInput.value;
-    const responseDiv = document.getElementById("response");
-    console.log(responseDiv);
-
-    // show the popup for the code and wait for the user to provide the verification code code
-    // method inspiration: https://stackoverflow.com/questions/65915371/how-do-i-make-the-program-wait-for-a-button-click-to-go-to-the-next-loop-iterati
-    await showCodePopup();
-    // request a verification to be sent via email
-    const ver_resp = await fetch("/send_verify_code",
-        {
+if (form != null){
+    form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const username = usernameInput.value;
+        const password = passwordInput.value;
+        const responseDiv = document.getElementById("response");
+        console.log(responseDiv);
+    
+        // show the popup for the code and wait for the user to provide the verification code code
+        // method inspiration: https://stackoverflow.com/questions/65915371/how-do-i-make-the-program-wait-for-a-button-click-to-go-to-the-next-loop-iterati
+        await showCodePopup();
+        // request a verification to be sent via email
+        const ver_resp = await fetch("/send_verify_code",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({username
+    }),
+            })
+            .then((response) => response.json())
+            .then((data) => {
+                console.log(data);
+            });
+    
+        // wait for the verification popup for to be completed or closed
+        await waitForVerify();
+    
+        if (!boolVerified) {
+            console.log("NOT Verified, POST login");
+            // Display an error message for failed login
+            const error = document.querySelector("#error");
+            responseDiv.innerText = "Wrong username or password.";
+            return;
+        }
+    
+        console.log("Verified, POST login");
+    
+        const response = await fetch("/login", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({username
-}),
+            body: JSON.stringify({ username, password })
         })
-        .then((response) => response.json())
-        .then((data) => {
-            console.log(data);
-        });
-
-    // wait for the verification popup for to be completed or closed
-    await waitForVerify();
-
-    if (!boolVerified) {
-        console.log("NOT Verified, POST login");
-        // Display an error message for failed login
-        const error = document.querySelector("#error");
-        responseDiv.innerText = "Wrong username or password.";
-        return;
-    }
-
-    console.log("Verified, POST login");
-
-    const response = await fetch("/login", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ username, password })
-    })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success == true) {
-                csrfToken = data.csrftoken
-                // Redirect to the home page
-                window.location.href = "/posts.html";
-                responseDiv.innerText = "Login successful!";
-            } else {
-                // Display an error message
-                const error = document.querySelector("#error");
-                responseDiv.innerText = "Wrong username or password.";
-                error.textContent = data.message;
-            }
-        })
-        .catch((error) => console.error(error));
-});
+            .then(response => response.json())
+            .then(data => {
+                if (data.success == true) {
+                    csrfToken = data.csrftoken
+                    // Redirect to the home page
+                    window.location.href = "/posts.html";
+                    responseDiv.innerText = "Login successful!";
+                } else {
+                    // Display an error message
+                    const error = document.querySelector("#error");
+                    responseDiv.innerText = "Wrong username or password.";
+                    error.textContent = data.message;
+                }
+            })
+            .catch((error) => console.error(error));
+    });
+}
 
 // LOGIN 2FA
 
@@ -444,55 +456,57 @@ const signupPasswordInput = document.querySelector("#psw");
 const signupRepeatPasswordInput = document.querySelector("#psw-repeat");
 const signupEmail = document.querySelector("#email");
 
-signupForm.addEventListener("submit", async (event) => {
-    console.log(
-        "neredeyiz",
-        signupPasswordInput.value,
-        signupRepeatPasswordInput.value
-    );
-    event.preventDefault();
-    const username = signupUsernameInput.value;
-    const password = signupPasswordInput.value;
-    const repeatpassword = signupRepeatPasswordInput.value;
-    const email = signupEmail.value;
-    const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
-    const passwordRegex =
-        /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+-={[}\]|\\:;"'<,>.?/])(?!.*\s).{8,}$/;
-    if (!emailRegex.test(email)) {
-        console.log("Invalid email address");
-        return;
-    }
-    if (!passwordRegex.test(password)) {
-        console.log("Invalid password ");
-        return;
-    }
-    if (password !== repeatpassword) {
-        console.log("Password doesn't match");
-        return;
-    }
-    const responseDiv = document.getElementById("response");
-    console.log(responseDiv);
-    const response = await fetch("/signup", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ username, password, email }),
-        })
-        .then((response) => response.json())
-        .then((data) => {
-            if (data.success) {
-                // Redirect to the home page
-                window.location.href = "/posts.html";
-                responseDiv.innerText = "Signup successful!";
-            } else {
-                // Display an error message
-                const error = document.querySelector("#error");
-                error.textContent = data.message;
-            }
-        })
-        .catch((error) => console.error(error));
-});
+if(signupForm != null){
+    signupForm.addEventListener("submit", async (event) => {
+        console.log(
+            "neredeyiz",
+            signupPasswordInput.value,
+            signupRepeatPasswordInput.value
+        );
+        event.preventDefault();
+        const username = signupUsernameInput.value;
+        const password = signupPasswordInput.value;
+        const repeatpassword = signupRepeatPasswordInput.value;
+        const email = signupEmail.value;
+        const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+        const passwordRegex =
+            /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+-={[}\]|\\:;"'<,>.?/])(?!.*\s).{8,}$/;
+        if (!emailRegex.test(email)) {
+            console.log("Invalid email address");
+            return;
+        }
+        if (!passwordRegex.test(password)) {
+            console.log("Invalid password ");
+            return;
+        }
+        if (password !== repeatpassword) {
+            console.log("Password doesn't match");
+            return;
+        }
+        const responseDiv = document.getElementById("response");
+        console.log(responseDiv);
+        const response = await fetch("/signup", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ username, password, email }),
+            })
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.success) {
+                    // Redirect to the home page
+                    window.location.href = "/posts.html";
+                    responseDiv.innerText = "Signup successful!";
+                } else {
+                    // Display an error message
+                    const error = document.querySelector("#error");
+                    error.textContent = data.message;
+                }
+            })
+            .catch((error) => console.error(error));
+    });
+}
 
 function logout() {
     fetch("/logout", { method: "POST" })

@@ -106,6 +106,7 @@ app.post("/Search", async (req, res) => {
     const postToAdd = {
       //TEST DATA
       posts: [],
+      success: false,
     };
 
     // add each posts info to the JSON to return
@@ -122,6 +123,7 @@ app.post("/Search", async (req, res) => {
           datePost: tempDate,
         };
         postToAdd.posts.push(postJSON);
+        postToAdd.success = true;
       }
     }
     //send the data back
