@@ -370,10 +370,34 @@ async function showCodePopup() {
     document.getElementById("validationCodePopup").style.display = "Block";
 }
 
-function verifyCode(){
-    boolVerified = true;
+async function verifyCode(){
+    //get the submitted code
+    let ver_code = document.getElementById("code").value;
+    
+    //get the username
+    const username = usernameInput.value;
 
     //TODO: send the code entered to the server to verify with.
+    let ver_response = await fetch("/verify_code",{
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({username, ver_code}),
+        })
+        .then((response) => response.json())
+        .then((data) => {
+            if (data.success) {
+                console.log("verify success")
+                boolVerified = true;
+            } else {
+                console.log("verify failed")
+                boolVerified = false;
+            }
+        })
+        .catch((error) => console.error(error));
+
+
 
     document.getElementById("valCodePopup").remove(); // remove the popup form
     // do what need to be done before resolving the wait promise

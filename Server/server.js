@@ -185,13 +185,15 @@ app.post('/send_verify_code', async (req, res) => {
       
       // make sure that we only get one email address back
       if (dbResult.rows.length != 1) {
-        res.json({ success: false, message: "Invalid username or password" })
+        res.json({ success: false})
       }else{
         let email = dbResult.rows[0]["email"];
 
         //todo: send the verification email
         sent_code = sendVerificationEmail(email);
         codes.set(username, sent_code);
+        res.json({ success: true });
+
       }
     } catch (error) {
       console.log(error.stack);
@@ -201,9 +203,41 @@ app.post('/send_verify_code', async (req, res) => {
         console.log("client has disconnected");
         if (err) {
           console.log("error during disconnection", err.stack);
+          res.json({ success: false});
+
         }
       });
     }
+});
+
+app.post('/verify_code', async (req, res) => {
+  const { username, ver_code } = req.body; // get the info from the body of the request
+  console.log("body:");
+  console.log(req.body);
+  console.log("stored codes:");
+  console.log(codes);
+  console.log("username: " + username);
+  //check if the username given has tried to got in and got it a code linked to it
+  if (codes.has(username)) {
+    // check if the codes match
+    console.log("submitted code: " + ver_code);
+    console.log("stored code: " + codes.get(username));
+    if (codes.get(username) == ver_code) {
+      // success, the code matches, verify the login to go ahead
+      console.log("verified");
+      res.json({ success: true });
+    }else {
+      // failed, code doesn't match, login attempt is blocked
+      console.log("failed verification");
+      res.json({ success: false});
+    }
+    //deleted the user and its code from the temp store
+    codes.delete(username);
+  }else {
+    // failed, username doesn't match, login attempt is blocked
+    console.log("user didn't ask to login so bo codes stored");
+    res.json({ success: false});
+  }
 });
 
 app.post("/login", async (req, res) => {
@@ -360,7 +394,7 @@ function sendEmail(to_, subject_, message_){
       text: message_,
       html: "",
     }).then(info => {
-      console.log({info});
+      // console.log({info});
     }).catch(console.error);
 }
 
