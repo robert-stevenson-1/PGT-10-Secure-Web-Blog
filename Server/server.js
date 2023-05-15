@@ -5,6 +5,10 @@ install links for requires software and tools:
 - Express: https://expressjs.com/en/
 - pg module: https://www.npmjs.com/package/pg
 - body parser module: https://www.npmjs.com/package/body-parser
+- nodemailer module: npm install nodemailer
+
+Setting nodemailer up to use gmail:
+- https://stackoverflow.com/questions/71477637/nodemailer-and-gmail-after-may-30-2022
 
 /*
 TODO:
@@ -29,6 +33,11 @@ const bcrypt = require("bcrypt");
 const dbQueries = require("./SQL_queries.js"); // import the SQL queries that we will use regularly
 const config = require("./config.js"); // import the config file
 const cookieParser = require("cookie-parser");
+const nodemailer = require("nodemailer");
+//setup the mail transporter
+const transporter = nodemailer.createTransport(config.gmail);
+//try to connect with the server and show the connection info (prints 'true') when the execution gets success, and error when the execution gets fail
+transporter.verify().then(console.log).catch(console.error);
 
 //setup the express server app
 const port = config.site.port; // set the port
@@ -40,6 +49,8 @@ app.use(bodyParser.json()); // parse application/json
 const pool = new pg.Pool(config.database); // create a new postgresql pool
 // const client = pool.connect(); // create and connect a client to the database
 
+//Temp store for each user's verification code together with the username that is linked to
+let codes = new Map();
 /*
 source: https://blog.logrocket.com/crud-rest-api-node-js-express-postgresql/
 
@@ -160,6 +171,75 @@ async function getPostsJSON() {
 
 const SESSIONS = new Map();
 const CSRFToken = new Map();
+
+app.post('/send_verify_code', async (req, res) => {
+  const {username} = req.body; // get the username
+  const client = await pool.connect(); // create and connect a client to the database
+  
+  try{
+      // Query the database for the user's email with the given username
+      params = [
+        username
+      ];
+      // Create send the query with db with the parameter values and read request from the database
+      dbResult = await client.query(dbQueries.GET_USER_EMAIL, params);
+      
+      // make sure that we only get one email address back
+      if (dbResult.rows.length != 1) {
+        res.json({ success: false})
+      }else{
+        let email = dbResult.rows[0]["email"];
+
+        //todo: send the verification email
+        sent_code = sendVerificationEmail(email);
+        codes.set(username, sent_code);
+        res.json({ success: true });
+
+      }
+    } catch (error) {
+      console.log(error.stack);
+    } finally {
+      client.end((err) => {
+        // source: https://node-postgres.com/apis/client#clientend
+        console.log("client has disconnected");
+        if (err) {
+          console.log("error during disconnection", err.stack);
+          res.json({ success: false});
+
+        }
+      });
+    }
+});
+
+app.post('/verify_code', async (req, res) => {
+  const { username, ver_code } = req.body; // get the info from the body of the request
+  console.log("body:");
+  console.log(req.body);
+  console.log("stored codes:");
+  console.log(codes);
+  console.log("username: " + username);
+  //check if the username given has tried to got in and got it a code linked to it
+  if (codes.has(username)) {
+    // check if the codes match
+    console.log("submitted code: " + ver_code);
+    console.log("stored code: " + codes.get(username));
+    if (codes.get(username) == ver_code) {
+      // success, the code matches, verify the login to go ahead
+      console.log("verified");
+      res.json({ success: true });
+    }else {
+      // failed, code doesn't match, login attempt is blocked
+      console.log("failed verification");
+      res.json({ success: false});
+    }
+    //deleted the user and its code from the temp store
+    codes.delete(username);
+  }else {
+    // failed, username doesn't match, login attempt is blocked
+    console.log("user didn't ask to login so bo codes stored");
+    res.json({ success: false});
+  }
+});
 
 app.post("/login", async (req, res) => {
   const { username, password } = req.body;
@@ -291,6 +371,38 @@ app.post("/signup", (req, res) => {
     });
   });
 });
+
+/**
+ * send a verification code to the email address
+ * @param {string} email The email address to send the code to
+ * @returns {number} The verification code sent
+*/
+function sendVerificationEmail(email){
+  let code = generateVerificationCode();
+  let email_body = "Verification Code: " + code;
+  sendEmail(email, "BLOGLIFE: Verification Code", email_body);
+
+  return code;
+}
+
+function generateVerificationCode(){
+  //TODO: generate 6 digit verification code
+  var minm = 000000;
+  var maxm = 999999;
+  return Math.floor(Math.random() * (maxm - minm + 1)) + minm;
+}
+
+function sendEmail(to_, subject_, message_){
+    transporter.sendMail({
+      from: config.gmail.auth.user,
+      to: to_,
+      subject: subject_,
+      text: message_,
+      html: "",
+    }).then(info => {
+      // console.log({info});
+    }).catch(console.error);
+}
 
 const crypto = require("crypto");
 const { strict } = require("assert");
