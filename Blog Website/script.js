@@ -4,13 +4,15 @@ window.onload = onload();
 const formSearch = document.getElementById("formSearch");
 const inputSearch = document.getElementById("searchBar");
 // const btnSearch = document.getElementById('searchBtn');
-// when ever the search bar is typed in then run event
-inputSearch.addEventListener("keyup", function (event) {
-    if (event.key === "Enter") {
-        console.log(location.href);
-        searchPosts();
-    }
-});
+if (inputSearch != null){
+    // when ever the search bar is typed in then run event
+    inputSearch.addEventListener("keyup", function (event) {
+        if (event.key === "Enter") {
+            console.log(location.href);
+            searchPosts();
+        }
+    });
+}
 
 /**
  * On the page load, run...
