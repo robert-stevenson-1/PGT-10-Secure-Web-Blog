@@ -159,10 +159,11 @@ async function getPostsJSON() {
 }
 
 const SESSIONS = new Map();
+const CSRFToken = new Map();
 
 app.post("/login", async (req, res) => {
   const { username, password } = req.body;
-
+  
   try {
     // Connect to the database using the configuration options
     const pool = new pg.Pool(config.database);
@@ -172,6 +173,7 @@ app.post("/login", async (req, res) => {
     const values = [username];
 
     const result = await pool.query(query, values);
+    const csrfToken = crypto.randomUUID();
 
     if (result.rows.length === 1) {
       // If the query returns exactly one row, the user is authenticated
@@ -181,13 +183,15 @@ app.post("/login", async (req, res) => {
         createSession(username);
 
         const sessionID = crypto.randomUUID();
-        SESSIONS.set(sessionID, username);
+        CSRFToken.set(csrfToken,{username});
+        SESSIONS.set(sessionID, {username});
         res.cookie("sessionId", sessionID, {
           secure: true,
           httpOnly: true,
           sameSite: "strict",
         });
-        res.json({ success: true });
+        res.cookie("csrfToken",csrfToken)
+        res.json({success:true, csrfToken, message:'Authed as ${req.body.username}' });
         console.table(Array.from(SESSIONS));
         console.log("success");
       } else {
@@ -204,6 +208,8 @@ app.post("/login", async (req, res) => {
     console.log(error.stack);
   }
 });
+
+
 
 app.post("/logout", (req, res) => {
   const sessionId = res.cookie("sessionId");

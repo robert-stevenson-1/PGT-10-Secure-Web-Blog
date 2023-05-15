@@ -275,6 +275,8 @@ const passwordInput = document.querySelector('#password');
 
 const usernameDiv = document.getElementById('username');
 
+let csrfToken
+
 form.addEventListener('submit', async (event) => {
     event.preventDefault();
     const username = usernameInput.value;
@@ -290,7 +292,8 @@ form.addEventListener('submit', async (event) => {
     })
         .then(response => response.json())
         .then(data => {
-            if (data.success) {
+            if (data.success == true) {
+                csrfToken = data.csrftoken
                 // Redirect to the home page
                 window.location.href = '/posts.html';
                 responseDiv.innerText = 'Login successful!';
