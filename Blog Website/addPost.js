@@ -8,15 +8,18 @@ const userId = 1
 
 formBlogPost.addEventListener('submit', async (event) => {
     event.preventDefault();
-    console.log("test")
+    console.log("post submit attempt")
     const blogUserId = 1
     const blogTitle = postTitle.value;
     const blogContent = postContent.value;
-    const responseDiv = document.getElementById('response');
+    // const responseDiv = document.getElementById('response');
     console.log("test2")
     console.log("Title: ", blogTitle)
     console.log("Body: ", blogContent)
     console.log("ID: ", blogUserId)
+    modal.style.display = "block";
+    console.log('response modal triggered')
+    console.log('Response: ', window.location.href)
 
     const response = await fetch('/addpost', {
         method: 'POST',
@@ -28,8 +31,11 @@ formBlogPost.addEventListener('submit', async (event) => {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
+                console.log('Blog post success mk2')
                 // Redirect to the home page
                 window.location.href = '/posts.html';
+                //success modal
+                modal.style.display = "block"
     
             } else {
                 // Display an error message
@@ -41,14 +47,28 @@ formBlogPost.addEventListener('submit', async (event) => {
         .catch(error => console.error(error));
 });
 
-// // Function to show successful blog post response
-// function postResponse() {
-//     divMain = document.getElementById('main')
+// Function for successful blog post modal
+var modal = document.getElementById("responseModal");
 
-//     var divPostResponse = document.createElement('div')
-//     var h2PostReponse = document.createElement('h2')
+// Button that opens the modal
+var btn = document.getElementById("submitBtn");
 
-//     // arrange where insert element
-//     divPostResponse.appendChild(h2PostReponse)
-//     divMain.appendChild(divPostResponse)
+// <span> element that closes the modal
+var span = document.getElementsByClassName("close")[0];
+
+// // button trigger for modal
+// btn.onclick = function() {
+//   modal.style.display = "block";
 // }
+
+// close modal by clicking X
+span.onclick = function() {
+  modal.style.display = "none";
+}
+
+// close modal by clicking outside modal
+window.onclick = function(event) {
+  if (event.target == modal) {
+    modal.style.display = "none";
+  }
+}
