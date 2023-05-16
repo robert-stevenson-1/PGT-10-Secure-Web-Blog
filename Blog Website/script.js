@@ -151,22 +151,28 @@ async function searchPosts() {
  * @param {string} postDate The date that the post was posted (as a string) in the dd/mm/yyyy format
  * @returns Return the HTML element for displaying the whole post
  */
-function generatePostTemplate(postTitle, postBody, postUser, postDate) {
+
+function generatePostTemplate(postTitle, postBody, postUser, postDate){
     // create the container of the post
-    var divPostContainer = document.createElement("div");
-    var divCenter = document.createElement("div"); // container for centering the post
-    var h3PostTitle = document.createElement("h3");
-    var pPostBody = document.createElement("p");
-    var divPostInfo = document.createElement("div");
-    var divPostUser = document.createElement("div");
-    var divPostDate = document.createElement("div");
+    var divPostContainer = document.createElement('div');
+    var divCenter = document.createElement('div'); // container for centering the post
+    var h3PostTitle = document.createElement('h3');
+    var pPostBody = document.createElement('p');
+    var divPostInfo = document.createElement('div');
+    var divPostUser = document.createElement('div');
+    var divPostDate = document.createElement('div');
+    var divPostTitle = document.createElement('div');
+    var divPostBody = document.createElement('div');
 
     // structure all the post's elements
     divPostContainer.appendChild(divCenter);
+    divPostContainer.appendChild(divPostTitle)
+    divPostContainer.appendChild(divPostBody)
+
     divPostContainer.appendChild(divPostInfo);
 
-    divCenter.appendChild(h3PostTitle);
-    divCenter.appendChild(pPostBody);
+    divPostTitle.appendChild(h3PostTitle);
+    divPostBody.appendChild(pPostBody);
 
     divPostInfo.appendChild(divPostUser);
     divPostInfo.appendChild(divPostDate);
@@ -174,10 +180,11 @@ function generatePostTemplate(postTitle, postBody, postUser, postDate) {
     //add the style tags to the HTML elements
     divPostContainer.classList.add("container-posts");
 
-    divCenter.classList.add("container-center");
+    divPostTitle.classList.add('postTitle')
+    divPostBody.classList.add('postBody')
 
-    divPostUser.classList.add("left-aligned");
-    divPostDate.classList.add("right-aligned");
+    divPostUser.classList.add('postUser')
+    divPostDate.classList.add('postDate')
 
     // add the information to the relevant post elements
     h3PostTitle.textContent = postTitle;
@@ -371,6 +378,43 @@ if (form != null){
 
 let btnCodeSubmit;
 let btnCodeClose;
+const formBlogPost = document.getElementById('newBlogPost');
+const postTitle = document.getElementById("postTitle");
+const  postContent = document.getElementById("postContent");
+
+formBlogPost.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    console.log("test")
+
+    const blogTitle = postTitle.value;
+    const blogContent = postContent.value;
+    const responseDiv = document.getElementById('response');
+
+    console.log(responseDiv);
+
+    const response = await fetch('/addpost', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ blogTitle, blogContent })
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Redirect to the home page
+                window.location.href = '/posts.html';
+    
+            } else {
+                // Display an error message
+                const error = document.querySelector('#error');
+                responseDiv.innerText = 'Unsuccessful';
+                error.textContent = data.message;
+            }
+        })
+        .catch(error => console.error(error));
+});
+
 
 function waitForVerify() {
     return new Promise(resolve => waitForVerifyResolve = resolve);
@@ -540,4 +584,8 @@ function fetchUserID() {
             alert("An error gettiıng userİD");
         });
 
+}
+
+function navToNewPost() {
+    window.location.href = "posts_new.html"
 }

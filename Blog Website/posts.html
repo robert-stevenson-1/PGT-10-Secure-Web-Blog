@@ -18,6 +18,9 @@
     />
     <link rel="stylesheet" href="style.css" />
     <style>
+      @import url('https://fonts.googleapis.com/css2?family=Alexandria&display=swap');
+      </style>
+    <style>
       h1,
       h2,
       h3,
@@ -46,6 +49,7 @@
         <a href="#" class="nav-button"><i class="fa fa-flickr"></i></a>
         <a href="#" class="nav-button"><i class="fa fa-twitter"></i></a>
         <a href="#" class="nav-button"><i class="fa fa-linkedin"></i></a>
+        <!-- Search -->
         <a href="#" class="nav-search right-aligned">
           <form id="formSearch">
             <!-- 
@@ -63,15 +67,17 @@
             <!-- <button id="searchBtn" type="submit"><i class="fa fa-search"></i></button> -->
           </form>
         </a>
-        
-
       </div>
     </header>
     <div id="main" class="container-center" >
       <!-- Blog entries -->
       <div class="container-posts" id="Posts">
-        <div class="container-center">
-          <h3>Posts</h3>
+        <div id="pageTitle" class="container-center">
+          <h2>POSTS</h2>
+        </div>
+        <!-- Button for new post -->
+        <div>
+          <button class="button btnNewPost" id="btnNewPost" type="button" onclick="navToNewPost()">New Post</button>
         </div>
         <!-- START OF BLOG ENTRIES  -->
         

@@ -483,3 +483,40 @@ module.exports = {
   getPostsJSON,
   app,
 };
+
+//submit new blog post
+
+
+// const btnPostSubmit = document.getElementById("btnPostSubmit");
+// when submit btn is clicked
+// inputSearch.addEventListener("postSubmit", function(event) {
+//     if (event.btn === "Enter") {
+//         console.log(location.href);
+//         submitPosts();
+//     }
+
+// Function for add post
+app.post('/addpost', (req, res) => {
+  const { blogUserId, blogTitle, blogContent} = req.body;
+
+  const pool = new pg.Pool(config.database);
+  pool.connect((err, client, done) => {
+      if (err) {
+          console.error('Error connecting to database', err);
+          res.status(500).json({ success: false, message: 'Internal server error' });
+          return;
+      }
+  const query = 'INSERT INTO posts (account_id, title, content) VALUES ($1, $2, $3) RETURNING id;';
+  const values = [blogUserId, blogTitle, blogContent];
+  console.log(values);
+  client.query(query, values, (err, result) => {
+    done(); // Release the client back to the pool
+
+    if (err) {
+        console.error('Error querying database', err);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+        return;
+    }
+      });
+    });
+  });
