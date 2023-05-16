@@ -1,12 +1,15 @@
+const { response } = require("express");
+
 const formBlogPost = document.getElementById('newBlogPost');
 const postTitle = document.getElementById("postTitle");
 const  postContent = document.getElementById("postContent");
-const userId = document.getElementById("userId");
+// const userId = document.getElementById("userId");
+const userId = 1
 
 formBlogPost.addEventListener('submit', async (event) => {
     event.preventDefault();
     console.log("test")
-    const blogUserId = userId.value;
+    const blogUserId = 1
     const blogTitle = postTitle.value;
     const blogContent = postContent.value;
     const responseDiv = document.getElementById('response');
@@ -20,7 +23,7 @@ formBlogPost.addEventListener('submit', async (event) => {
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ blogTitle, blogContent,blogUserId })
+        body: JSON.stringify({ blogUserId, blogTitle, blogContent })
     })
         .then(response => response.json())
         .then(data => {
@@ -37,3 +40,15 @@ formBlogPost.addEventListener('submit', async (event) => {
         })
         .catch(error => console.error(error));
 });
+
+// // Function to show successful blog post response
+// function postResponse() {
+//     divMain = document.getElementById('main')
+
+//     var divPostResponse = document.createElement('div')
+//     var h2PostReponse = document.createElement('h2')
+
+//     // arrange where insert element
+//     divPostResponse.appendChild(h2PostReponse)
+//     divMain.appendChild(divPostResponse)
+// }

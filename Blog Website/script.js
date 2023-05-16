@@ -332,3 +332,7 @@ form.addEventListener('submit', async (event) => {
         })
         .catch(error => console.error(error));
 });
+
+function navToNewPost() {
+    window.location.href = "posts_new.html"
+}

@@ -238,7 +238,7 @@ module.exports = {
 
 // Function for add post
 app.post('/addpost', (req, res) => {
-  const { userId, blogTitle, blogContent} = req.body;
+  const { blogUserId, blogTitle, blogContent} = req.body;
 
   const pool = new pg.Pool(config.database);
   pool.connect((err, client, done) => {
@@ -247,8 +247,8 @@ app.post('/addpost', (req, res) => {
           res.status(500).json({ success: false, message: 'Internal server error' });
           return;
       }
-  const query = 'INSERT INTO newposts (title, content) VALUES ($1, $2) RETURNING id;';
-  const values = [blogTitle, blogContent];
+  const query = 'INSERT INTO posts (account_id, title, content) VALUES ($1, $2, $3) RETURNING id;';
+  const values = [blogUserId, blogTitle, blogContent];
   console.log(values);
   client.query(query, values, (err, result) => {
     done(); // Release the client back to the pool
@@ -261,36 +261,3 @@ app.post('/addpost', (req, res) => {
       });
     });
   });
-
-    // // check for presence of value and is larger than 0
-    // if (val && val.trim().length > 0) {
-    //     // trim makes sure to cut off any tailing whitespace
-    //     val = val.trim(); // trim the tailing whitespace
-    //     val = val.toLowerCase(); // reduce all the characters to lowercase representation where possible
-    //     // data = {
-    //     //     "search": val,
-    //     // };
-    //     // console.log(JSON.stringify(data));
-
-    //     //written with the aid of: https://www.digitalocean.com/community/tutorials/use-expressjs-to-get-url-and-post-parameters
-    //     fetch(`/Search?search=${val}`,
-    //     {
-    //         method: 'POST',
-    //         headers: {
-    //             "Content-Type": "application/json",
-    //         },
-    //     }).then(function (response) { //with the response....
-    //         console.log("Status: " + response.status);
-    //         console.log(response);
-    //         return response.json() // return the JSON of the response
-    //     }).then(function(data){
-    //         // store the search results in session storage so that we can use it in the search.html page
-    //         // Reference: https://www.w3schools.com/HTML/html5_webstorage.asp
-    //         console.log(data);
-    //         //store the JSON data as a string in sessionStorage
-    //         sessionStorage.setItem("searchResult", JSON.stringify(data));
-    //     }).then(function(){
-    //         // redirect to search page
-    //         window.location.href = '/Search.html';
-    //     })
-    //     .catch(error => console.error(error)); // catch any error and print it out

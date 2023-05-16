@@ -51,22 +51,36 @@
     </header>
 
     <!-- New Post Title -->
-    <div class="container-posts"></div>
       <div id="main" class="container-center">
-          <h1>New Post</h1>
+        <div id="pageTitle" class="container-center">
+          <h1>NEW POST</h1>
+        </div>
       </div>
       <!-- Section for Post form -->
-        <form id="newBlogPost"  method="post">
-          <label for="title">Title</label>
-          <input type="text" id="postTitle" name="postTitle" required>
-          <label for="content">Content</label>
-          <input type="text" id="postContent" name="postContent" rows="10" cols="50" required>
-          <label for="content">userid</label>
-          <input type="number" id="userId" name="userId" rows="10" cols="50" required>
-        
-          <br>
-          <input type="submit" value="Post">
-        </form>
+      <div class="container-posts">
+        <div class="container-center">
+          <form id="newBlogPost"  method="post">
+            <div class="postTitle">
+              <label for="title">Title: </label>
+              <div>
+                <input type="text" id="postTitle" name="postTitle" required>
+              </div>
+            </div>
+            <div class="postBody">
+              <label for="content">Content</label>
+              <div>
+                <textarea id="postContent" name="postContent" placeholder="New blog post.." required></textarea>
+              </div>
+              </div>  
+            <!-- Manual userID input when there is no session -->
+            <!-- <label for="content">userid</label> -->
+            <!-- <input type="number" id="userId" name="userId" rows="10" cols="50" required> -->
+          
+            <br>
+            <input class="button btnNewPost" type="submit" value="Post">
+          </form>
+        </div>
+      </div>
     </div>  
     
 
