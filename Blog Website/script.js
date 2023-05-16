@@ -1,10 +1,12 @@
+
 // === set the events ===
 window.onload = onload();
+
 
 const formSearch = document.getElementById("formSearch");
 const inputSearch = document.getElementById("searchBar");
 // const btnSearch = document.getElementById('searchBtn');
-if (inputSearch != null){
+if (inputSearch != null) {
     // when ever the search bar is typed in then run event
     inputSearch.addEventListener("keyup", function (event) {
         if (event.key === "Enter") {
@@ -43,6 +45,8 @@ async function onload() {
             })
             .then((data) => processPosts(data))
             .catch((error) => console.error(error)); // catch any error and print it out
+
+        fetchUserID();
     }
 
     if (window.location.href.includes("/Search.html")) {
@@ -90,7 +94,7 @@ async function searchPosts() {
     console.log(inputSearch);
 
     //data to send
-    let val = inputSearch.value;
+    let val = inputSearch.value; //check the regex
     // check for presence of value and is larger than 0
     if (val && val.trim().length > 0) {
         // trim makes sure to cut off any tailing whitespace
@@ -289,6 +293,8 @@ const form = document.getElementById("loginForm");
 const usernameInput = document.querySelector("#username");
 const passwordInput = document.querySelector("#password");
 
+const userNameLabel = document.getElementById("usernameLabel");
+
 const usernameDiv = document.getElementById("username");
 
 form.addEventListener("submit", async (event) => {
@@ -298,25 +304,25 @@ form.addEventListener("submit", async (event) => {
     const responseDiv = document.getElementById("response");
     console.log(responseDiv);
 
-    // show the popup for the code and wait for the user to provide the verification code code
-    // method inspiration: https://stackoverflow.com/questions/65915371/how-do-i-make-the-program-wait-for-a-button-click-to-go-to-the-next-loop-iterati
-    await showCodePopup();
-    // request a verification to be sent via email
-    const ver_resp = await fetch("/send_verify_code",
-        {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({username
-}),
-        })
-        .then((response) => response.json())
-        .then((data) => {
-            console.log(data);
-        });
+    //show the popup for the code and wait for the user to provide the verification code code
+    //method inspiration: https://stackoverflow.com/questions/65915371/how-do-i-make-the-program-wait-for-a-button-click-to-go-to-the-next-loop-iterati
+        await showCodePopup();
+        // request a verification to be sent via email
+        const ver_resp = await fetch("/send_verify_code",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({username
+    }),
+            })
+            .then((response) => response.json())
+            .then((data) => {
+                console.log(data);
+            });
 
-    // wait for the verification popup for to be completed or closed
+    //wait for the verification popup for to be completed or closed
     await waitForVerify();
 
     if (!boolVerified) {
@@ -375,21 +381,21 @@ async function showCodePopup() {
     document.getElementById("validationCodePopup").style.display = "Block";
 }
 
-async function verifyCode(){
+async function verifyCode() {
     //get the submitted code
     let ver_code = document.getElementById("code").value;
-    
+
     //get the username
     const username = usernameInput.value;
 
     //TODO: send the code entered to the server to verify with.
-    let ver_response = await fetch("/verify_code",{
+    let ver_response = await fetch("/verify_code", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify({username, ver_code}),
-        })
+        body: JSON.stringify({ username, ver_code }),
+    })
         .then((response) => response.json())
         .then((data) => {
             if (data.success) {
@@ -412,10 +418,10 @@ async function verifyCode(){
 function closeCodePopup() {
     console.log("closeCodePopup");
 
-    boolVerified = false;    
-    
+    boolVerified = false;
+
     document.getElementById("valCodePopup").remove(); // remove the popup form
-    
+
     // do what need to be done before resolving the wait promise
     if (waitForVerifyResolve) waitForVerifyResolve(); // resolve the promise
 }
@@ -427,7 +433,7 @@ function drawCodePopup() {
 
     popupDiv.innerHTML = "<div class=\"formPopup\" id=\"validationCodePopup\"><form class=\"formContainer\"><h2>Validation code</h2><label for=\"code\"><strong>Code:</strong></label><input type=\"text\" id=\"code\" name=\"code\" required><button type=\"button\" class=\"btn\" id=\"btnCodeSubmit\">Submit</button><button type=\"button\" class=\"btn cancel\" id=\"btnCodeClose\">Close</button></form></div>";
 
-    document.getElementById("main").append(popupDiv);  
+    document.getElementById("main").append(popupDiv);
 
     btnCodeSubmit = document.getElementById("btnCodeSubmit");
     btnCodeClose = document.getElementById("btnCodeClose");
@@ -478,7 +484,7 @@ signupForm.addEventListener("submit", async (event) => {
             "Content-Type": "application/json",
         },
         body: JSON.stringify({ username, password, email }),
-        })
+    })
         .then((response) => response.json())
         .then((data) => {
             if (data.success) {
@@ -508,4 +514,20 @@ function logout() {
             console.log(error);
             alert("An error occurs while logging out!");
         });
-    }
+}
+
+function fetchUserID() {
+    fetch("/userId", { method: "GET" })
+        .then((response) => {
+            return response.json(); // return the JSON of the response
+        })
+        .then(function (data) {
+            console.log(data.userid);
+            document.getElementById("userid").textContent = data.userid; // display the userid value in an element with id="userid"
+        })
+        .catch((error) => {
+            console.log(error);
+            alert("An error gettiıng userİD");
+        });
+
+}

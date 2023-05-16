@@ -34,16 +34,28 @@ const dbQueries = require("./SQL_queries.js"); // import the SQL queries that we
 const config = require("./config.js"); // import the config file
 const cookieParser = require("cookie-parser");
 const nodemailer = require("nodemailer");
+const sessions =require("express-session")
 //setup the mail transporter
 const transporter = nodemailer.createTransport(config.gmail);
 //try to connect with the server and show the connection info (prints 'true') when the execution gets success, and error when the execution gets fail
 transporter.verify().then(console.log).catch(console.error);
+
+
 
 //setup the express server app
 const port = config.site.port; // set the port
 const app = express(); // create express app
 app.use(express.static(path.join(__dirname, config.site.path))); // set the static folder
 app.use(bodyParser.json()); // parse application/json
+app.use(cookieParser());
+
+const oneDay = 1000 * 60 * 60 * 24;
+app.use(sessions({
+    secret: "thisismysecrctekeyfhrgfgrfrty84fwir767",
+    saveUninitialized:true,
+    cookie: { maxAge: oneDay },
+    resave: false 
+}));
 
 //Link PostgreSQL database with Express in Node.js
 const pool = new pg.Pool(config.database); // create a new postgresql pool
@@ -51,6 +63,9 @@ const pool = new pg.Pool(config.database); // create a new postgresql pool
 
 //Temp store for each user's verification code together with the username that is linked to
 let codes = new Map();
+
+//store the users and their session
+let userSession = new Map();
 /*
 source: https://blog.logrocket.com/crud-rest-api-node-js-express-postgresql/
 
@@ -69,6 +84,7 @@ app.listen(port, () => {
   console.log("Server listening and started at http://localhost:" + port);
 });
 
+
 // API Request Methods:
 
 //get the posts for the database and display them on the main page of the site
@@ -78,6 +94,7 @@ app.get("/getPosts", async (req, res) => {
   // send the posts to add to the site in the post container
   res.send(posts);
 });
+
 
 app.post("/Search", async (req, res) => {
   // To Secure against SQL injection:
@@ -93,6 +110,13 @@ app.post("/Search", async (req, res) => {
   console.log(params);
 
   data = {};
+  console.log(CSRFToken)
+  if(req.cookies.csrfToken===CSRFToken[0].csrfToken){
+    console.log("CSRF validated")
+
+  }else{
+    console.log("invalidToken")
+  }
   //create a client to interact with the database
   const client = await pool.connect(); // create and connect a client to the database
   //try to get the data from the database
@@ -170,7 +194,7 @@ async function getPostsJSON() {
 }
 
 const SESSIONS = new Map();
-const CSRFToken = new Map();
+const CSRFToken = new Array;
 
 app.post('/send_verify_code', async (req, res) => {
   const {username} = req.body; // get the username
@@ -241,6 +265,8 @@ app.post('/verify_code', async (req, res) => {
   }
 });
 
+//var session;
+
 app.post("/login", async (req, res) => {
   const { username, password } = req.body;
   
@@ -260,19 +286,26 @@ app.post("/login", async (req, res) => {
       const user = result.rows[0];
       const isPasswordMatch = await bcrypt.compare(password, user.password);
       if (isPasswordMatch) {
-        createSession(username);
+        // createSession(username);
 
         const sessionID = crypto.randomUUID();
-        CSRFToken.set(csrfToken,{username});
-        SESSIONS.set(sessionID, {username});
-        res.cookie("sessionId", sessionID, {
-          secure: true,
-          httpOnly: true,
-          sameSite: "strict",
-        });
+        CSRFToken.push({csrfToken , username});
+        // SESSIONS.set(sessionID, {username});
+        // res.cookie("sessionId", sessionID, {
+        //      secure: true,
+        //      httpOnly: true,
+        //      sameSite: "strict",
+        //    });
+        let tempSession = req.session
+        tempSession.userid = req.body.username;
+        tempSession.token = 1234;
+        userSession.set(username, tempSession);
+        console.log(userSession.get(username));
+
         res.cookie("csrfToken",csrfToken)
         res.json({success:true, csrfToken, message:'Authed as ${req.body.username}' });
         console.table(Array.from(SESSIONS));
+        console.table(Array.from(CSRFToken));
         console.log("success");
       } else {
         // If the query returns no rows or more than one row, the user is not authenticated
@@ -289,7 +322,11 @@ app.post("/login", async (req, res) => {
   }
 });
 
-
+app.get("/userId", (req, res)=>{
+  let session=req.session;
+  sessionuserid = session.userid;
+  res.json({userid : sessionuserid});
+});
 
 app.post("/logout", (req, res) => {
   const sessionId = res.cookie("sessionId");
@@ -414,23 +451,6 @@ function generateToken(length) {
     .slice(0, length); // return the required number of characters
 }
 
-async function createSession(username) {
-  const pool = new pg.Pool(config.database);
-  const token = generateToken(32);
-  const sessionQuery =
-    "INSERT INTO sessioninfo(username,token) VALUES ($1,$2) RETURNING sessionid;";
-  const sessionValues = [username, token];
-
-  try {
-    const client = await pool.connect();
-    const result = await client.query(sessionQuery, sessionValues);
-    client.release();
-    return { success: true, message: "Session is successful" };
-  } catch (err) {
-    console.error("Error querying database", err);
-    return { success: false, message: "Internal server error" };
-  }
-}
 
 async function queryDB(query) {
   data = {};
