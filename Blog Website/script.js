@@ -573,6 +573,7 @@ function logout() {
             console.log(error);
             alert("An error occurs while logging out!");
         });
+        window.location.href = "Index.html"
 }
 
 function fetchUserID() {
@@ -594,5 +595,6 @@ function fetchUserID() {
 function navToNewPost() {
     window.location.href = "posts_new.html"
 }
+
 
 
