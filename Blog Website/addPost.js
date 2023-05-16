@@ -1,4 +1,4 @@
-const { response } = require("express");
+// const { response } = require("express");
 
 const formBlogPost = document.getElementById('newBlogPost');
 const postTitle = document.getElementById("postTitle");
