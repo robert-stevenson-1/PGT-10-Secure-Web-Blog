@@ -11,7 +11,7 @@ if (inputSearch != null) {
         if (event.key === "Enter") {
             console.log(location.href);
             let boolSearchRedirect = searchPosts();
-            if (boolSearchRedirect == true){
+            if (boolSearchRedirect == true) {
                 // redirect to search page
                 window.location.href = "/Search.html";
             }
@@ -121,21 +121,21 @@ async function searchPosts() {
             })
             .then(function (data) {
                 //check if the are successful, and if true then carry on, else do nothing
-                if (data.success){
+                if (data.success) {
                     // store the search results in session storage so that we can use it in the search.html page
                     // Reference: https://www.w3schools.com/HTML/html5_webstorage.asp
                     console.log(data);
                     //store the JSON data as a string in sessionStorage
                     sessionStorage.setItem("searchResult", JSON.stringify(data));
-                    
+
                     // signal we are ok to redirect to the search result page
                     boolSearchRedirect = true;
                 }
                 return false;
             })
             .catch((error) => console.error(error)); // catch any error and print it out
-            
-            return boolSearchRedirect;
+
+        return boolSearchRedirect;
         // if (boolSearchRedirect == true){
         //     // redirect to search page
         //     window.location.href = "/Search.html";
@@ -152,7 +152,7 @@ async function searchPosts() {
  * @returns Return the HTML element for displaying the whole post
  */
 
-function generatePostTemplate(postTitle, postBody, postUser, postDate){
+function generatePostTemplate(postTitle, postBody, postUser, postDate) {
     // create the container of the post
     var divPostContainer = document.createElement('div');
     var divCenter = document.createElement('div'); // container for centering the post
@@ -310,14 +310,14 @@ const passwordInput = document.querySelector("#password");
 const userNameLabel = document.getElementById("usernameLabel");
 
 const usernameDiv = document.getElementById("username");
-if (form != null){
+if (form != null) {
     form.addEventListener("submit", async (event) => {
         event.preventDefault();
         const username = usernameInput.value;
         const password = passwordInput.value;
         const responseDiv = document.getElementById("response");
         console.log(responseDiv);
-    
+
         // show the popup for the code and wait for the user to provide the verification code code
         // method inspiration: https://stackoverflow.com/questions/65915371/how-do-i-make-the-program-wait-for-a-button-click-to-go-to-the-next-loop-iterati
         await showCodePopup();
@@ -328,17 +328,18 @@ if (form != null){
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({username
-            }),
+                body: JSON.stringify({
+                    username
+                }),
             })
             .then((response) => response.json())
             .then((data) => {
                 console.log(data);
             });
-    
+
         // wait for the verification popup for to be completed or closed
         await waitForVerify();
-    
+
         if (!boolVerified) {
             console.log("NOT Verified, POST login");
             // Display an error message for failed login
@@ -346,9 +347,9 @@ if (form != null){
             responseDiv.innerText = "Wrong username or password.";
             return;
         }
-    
+
         console.log("Verified, POST login");
-    
+
         const response = await fetch("/login", {
             method: "POST",
             headers: {
@@ -380,40 +381,41 @@ let btnCodeSubmit;
 let btnCodeClose;
 const formBlogPost = document.getElementById('newBlogPost');
 const postTitle = document.getElementById("postTitle");
-const  postContent = document.getElementById("postContent");
+const postContent = document.getElementById("postContent");
+if (formBlogPost != null) {
+    formBlogPost.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        console.log("test")
 
-formBlogPost.addEventListener('submit', async (event) => {
-    event.preventDefault();
-    console.log("test")
+        const blogTitle = postTitle.value;
+        const blogContent = postContent.value;
+        const responseDiv = document.getElementById('response');
 
-    const blogTitle = postTitle.value;
-    const blogContent = postContent.value;
-    const responseDiv = document.getElementById('response');
+        console.log(responseDiv);
 
-    console.log(responseDiv);
-
-    const response = await fetch('/addpost', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ blogTitle, blogContent })
-    })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Redirect to the home page
-                window.location.href = '/posts.html';
-    
-            } else {
-                // Display an error message
-                const error = document.querySelector('#error');
-                responseDiv.innerText = 'Unsuccessful';
-                error.textContent = data.message;
-            }
+        const response = await fetch('/addpost', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ blogTitle, blogContent })
         })
-        .catch(error => console.error(error));
-});
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Redirect to the home page
+                    window.location.href = '/posts.html';
+
+                } else {
+                    // Display an error message
+                    const error = document.querySelector('#error');
+                    responseDiv.innerText = 'Unsuccessful';
+                    error.textContent = data.message;
+                }
+            })
+            .catch(error => console.error(error));
+    });
+}
 
 
 function waitForVerify() {
@@ -502,7 +504,7 @@ const signupPasswordInput = document.querySelector("#psw");
 const signupRepeatPasswordInput = document.querySelector("#psw-repeat");
 const signupEmail = document.querySelector("#email");
 
-if(signupForm != null){
+if (signupForm != null) {
     signupForm.addEventListener("submit", async (event) => {
         console.log(
             "neredeyiz",
@@ -537,7 +539,7 @@ if(signupForm != null){
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({ username, password, email }),
-            })
+        })
             .then((response) => response.json())
             .then((data) => {
                 if (data.success) {
