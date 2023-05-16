@@ -289,9 +289,6 @@ function addLoginSignupButtons() {
 //     mainNav.appendChild(btnViewPost);
 // }
 
-
-
-
 let csrfToken
 
 // Login code:
@@ -325,7 +322,7 @@ if (form != null){
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({username
-    }),
+            }),
             })
             .then((response) => response.json())
             .then((data) => {
