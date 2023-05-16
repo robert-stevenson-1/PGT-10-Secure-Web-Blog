@@ -24,17 +24,17 @@ formBlogPost.addEventListener('submit', async (event) => {
         },
         body: JSON.stringify({ blogUserId, blogTitle, blogContent })
     })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
                 // Redirect to the home page
-                window.location.href = '/posts.html';
+            window.location.href = "/posts.html";
     
-            } else {
+        } else {
                 // Display an error message
-                const error = document.querySelector('#error');
-                responseDiv.innerText = 'Unsuccessful';
-                error.textContent = data.message;
+            const error = document.querySelector('#error');
+            responseDiv.innerText = 'Unsuccessful';
+            error.textContent = data.message;
             }
         })
         .catch(error => console.error(error));
@@ -70,3 +70,7 @@ async function fetchUserID() {
 //     divPostResponse.appendChild(h2PostReponse)
 //     divMain.appendChild(divPostResponse)
 // }
+
+function navToPost() {
+    window.location.href = "posts.html"
+}

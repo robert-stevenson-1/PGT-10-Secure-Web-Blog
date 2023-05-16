@@ -519,19 +519,20 @@ if (signupForm != null) {
         const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
         const passwordRegex =
             /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+-={[}\]|\\:;"'<,>.?/])(?!.*\s).{8,}$/;
+        const responseDiv = document.getElementById("response1");
         if (!emailRegex.test(email)) {
-            console.log("Invalid email address");
+            responseDiv.innerText = "Enter a valid email";
             return;
         }
         if (!passwordRegex.test(password)) {
-            console.log("Invalid password ");
+            responseDiv.innerText = "Enter 8 character long one capital letter, one number, one special character";
             return;
         }
         if (password !== repeatpassword) {
-            console.log("Password doesn't match");
+            responseDiv.innerText = "Password doesnt match.";
             return;
         }
-        const responseDiv = document.getElementById("response");
+        
         console.log(responseDiv);
         const response = await fetch("/signup", {
             method: "POST",
@@ -544,8 +545,10 @@ if (signupForm != null) {
             .then((data) => {
                 if (data.success) {
                     // Redirect to the home page
-                    window.location.href = "/posts.html";
                     responseDiv.innerText = "Signup successful!";
+                    
+                    window.location.href = "/";
+                    responseDiv.innerText = "Able to Login";
                 } else {
                     // Display an error message
                     const error = document.querySelector("#error");
@@ -591,3 +594,5 @@ function fetchUserID() {
 function navToNewPost() {
     window.location.href = "posts_new.html"
 }
+
+
