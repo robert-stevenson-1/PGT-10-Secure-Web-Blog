@@ -34,7 +34,7 @@ const dbQueries = require("./SQL_queries.js"); // import the SQL queries that we
 const config = require("./config.js"); // import the config file
 const cookieParser = require("cookie-parser");
 const nodemailer = require("nodemailer");
-const sessions =require("express-session")
+const sessions = require("express-session")
 //setup the mail transporter
 const transporter = nodemailer.createTransport(config.gmail);
 //try to connect with the server and show the connection info (prints 'true') when the execution gets success, and error when the execution gets fail
@@ -51,10 +51,10 @@ app.use(cookieParser());
 
 const oneDay = 1000 * 60 * 60 * 24;
 app.use(sessions({
-    secret: "thisismysecrctekeyfhrgfgrfrty84fwir767",
-    saveUninitialized:true,
-    cookie: { maxAge: oneDay },
-    resave: false 
+  secret: "thisismysecrctekeyfhrgfgrfrty84fwir767",
+  saveUninitialized: true,
+  cookie: { maxAge: oneDay },
+  resave: false
 }));
 
 //Link PostgreSQL database with Express in Node.js
@@ -111,10 +111,10 @@ app.post("/Search", async (req, res) => {
 
   data = {};
   console.log(CSRFToken)
-  if(req.cookies.csrfToken===CSRFToken[0].csrfToken){
+  if (req.cookies.csrfToken === CSRFToken[0].csrfToken) {
     console.log("CSRF validated")
 
-  }else{
+  } else {
     console.log("invalidToken")
   }
   //create a client to interact with the database
@@ -199,42 +199,42 @@ const SESSIONS = new Map();
 const CSRFToken = new Array;
 
 app.post('/send_verify_code', async (req, res) => {
-  const {username} = req.body; // get the username
+  const { username } = req.body; // get the username
   const client = await pool.connect(); // create and connect a client to the database
-  
-  try{
-      // Query the database for the user's email with the given username
-      params = [
-        username
-      ];
-      // Create send the query with db with the parameter values and read request from the database
-      dbResult = await client.query(dbQueries.GET_USER_EMAIL, params);
-      
-      // make sure that we only get one email address back
-      if (dbResult.rows.length != 1) {
-        res.json({ success: false})
-      }else{
-        let email = dbResult.rows[0]["email"];
 
-        //todo: send the verification email
-        sent_code = sendVerificationEmail(email);
-        codes.set(username, sent_code);
-        res.json({ success: true });
+  try {
+    // Query the database for the user's email with the given username
+    params = [
+      username
+    ];
+    // Create send the query with db with the parameter values and read request from the database
+    dbResult = await client.query(dbQueries.GET_USER_EMAIL, params);
+
+    // make sure that we only get one email address back
+    if (dbResult.rows.length != 1) {
+      res.json({ success: false })
+    } else {
+      let email = dbResult.rows[0]["email"];
+
+      //todo: send the verification email
+      sent_code = sendVerificationEmail(email);
+      codes.set(username, sent_code);
+      res.json({ success: true });
+
+    }
+  } catch (error) {
+    console.log(error.stack);
+  } finally {
+    client.end((err) => {
+      // source: https://node-postgres.com/apis/client#clientend
+      console.log("client has disconnected");
+      if (err) {
+        console.log("error during disconnection", err.stack);
+        res.json({ success: false });
 
       }
-    } catch (error) {
-      console.log(error.stack);
-    } finally {
-      client.end((err) => {
-        // source: https://node-postgres.com/apis/client#clientend
-        console.log("client has disconnected");
-        if (err) {
-          console.log("error during disconnection", err.stack);
-          res.json({ success: false});
-
-        }
-      });
-    }
+    });
+  }
 });
 
 app.post('/verify_code', async (req, res) => {
@@ -253,17 +253,17 @@ app.post('/verify_code', async (req, res) => {
       // success, the code matches, verify the login to go ahead
       console.log("verified");
       res.json({ success: true });
-    }else {
+    } else {
       // failed, code doesn't match, login attempt is blocked
       console.log("failed verification");
-      res.json({ success: false});
+      res.json({ success: false });
     }
     //deleted the user and its code from the temp store
     codes.delete(username);
-  }else {
+  } else {
     // failed, username doesn't match, login attempt is blocked
     console.log("user didn't ask to login so bo codes stored");
-    res.json({ success: false});
+    res.json({ success: false });
   }
 });
 
@@ -271,7 +271,7 @@ app.post('/verify_code', async (req, res) => {
 
 app.post("/login", async (req, res) => {
   const { username, password } = req.body;
-  
+
   try {
     // Connect to the database using the configuration options
     const pool = new pg.Pool(config.database);
@@ -291,7 +291,7 @@ app.post("/login", async (req, res) => {
         // createSession(username);
 
         const sessionID = crypto.randomUUID();
-        CSRFToken.push({csrfToken , username});
+        CSRFToken.push({ csrfToken, username });
         // SESSIONS.set(sessionID, {username});
         // res.cookie("sessionId", sessionID, {
         //      secure: true,
@@ -304,8 +304,8 @@ app.post("/login", async (req, res) => {
         userSession.set(username, tempSession);
         console.log(userSession.get(username));
 
-        res.cookie("csrfToken",csrfToken)
-        res.json({success:true, csrfToken, message:'Authed as ${req.body.username}' });
+        res.cookie("csrfToken", csrfToken)
+        res.json({ success: true, csrfToken, message: 'Authed as ${req.body.username}' });
         console.table(Array.from(SESSIONS));
         console.table(Array.from(CSRFToken));
         console.log("success");
@@ -324,10 +324,10 @@ app.post("/login", async (req, res) => {
   }
 });
 
-app.get("/userId", (req, res)=>{
-  let session=req.session;
+app.get("/userId", (req, res) => {
+  let session = req.session;
   sessionuserid = session.userid;
-  res.json({userid : sessionuserid});
+  res.json({ userid: sessionuserid });
 });
 
 app.post("/logout", (req, res) => {
@@ -416,7 +416,7 @@ app.post("/signup", (req, res) => {
  * @param {string} email The email address to send the code to
  * @returns {number} The verification code sent
 */
-function sendVerificationEmail(email){
+function sendVerificationEmail(email) {
   let code = generateVerificationCode();
   let email_body = "Verification Code: " + code;
   sendEmail(email, "BLOGLIFE: Verification Code", email_body);
@@ -424,23 +424,24 @@ function sendVerificationEmail(email){
   return code;
 }
 
-function generateVerificationCode(){
+function generateVerificationCode() {
   //TODO: generate 6 digit verification code
   var minm = 000000;
   var maxm = 999999;
-  return Math.floor(Math.random() * (maxm - minm + 1)) + minm;
+  return 123456;
+  //return Math.floor(Math.random() * (maxm - minm + 1)) + minm;
 }
 
-function sendEmail(to_, subject_, message_){
-    transporter.sendMail({
-      from: config.gmail.auth.user,
-      to: to_,
-      subject: subject_,
-      text: message_,
-      html: "",
-    }).then(info => {
-      // console.log({info});
-    }).catch(console.error);
+function sendEmail(to_, subject_, message_) {
+  transporter.sendMail({
+    from: config.gmail.auth.user,
+    to: to_,
+    subject: subject_,
+    text: message_,
+    html: "",
+  }).then(info => {
+    // console.log({info});
+  }).catch(console.error);
 }
 
 const crypto = require("crypto");
@@ -496,27 +497,40 @@ module.exports = {
 //     }
 
 // Function for add post
-app.post('/addpost', (req, res) => {
-  const { blogUserId, blogTitle, blogContent} = req.body;
+app.post('/addpost', async (req, res) => {
+  const { blogUserId, blogTitle, blogContent } = req.body;
 
-  const pool = new pg.Pool(config.database);
+  /* const pool = new pg.Pool(config.database);
   pool.connect((err, client, done) => {
       if (err) {
           console.error('Error connecting to database', err);
           res.status(500).json({ success: false, message: 'Internal server error' });
           return;
-      }
-  const query = 'INSERT INTO posts (account_id, title, content) VALUES ($1, $2, $3) RETURNING id;';
-  const values = [blogUserId, blogTitle, blogContent];
+      } */
+  const client = await pool.connect()
+  // get the user id from the database for username
+  let query = dbQueries.GET_USER_ID;
+  let values = [blogUserId];
+  let dbResult = await client.query(query, values);
+
+  let dbUserID;
+  
+  // make sure that we only get one ID back
+  if (dbResult.rows.length != 1) {
+    console.log("No ID found");
+    return;
+  } else {
+    dbUserID = dbResult.rows[0]["id"];
+  }
+
+  query = 'INSERT INTO posts (account_id, title, content) VALUES ($1, $2, $3) RETURNING id;';
+  values = [dbUserID, blogTitle, blogContent];
   console.log(values);
   client.query(query, values, (err, result) => {
-    done(); // Release the client back to the pool
-
     if (err) {
-        console.error('Error querying database', err);
-        res.status(500).json({ success: false, message: 'Internal server error' });
-        return;
+      console.error('Error querying database', err);
+      res.status(500).json({ success: false, message: 'Internal server error' });
+      return;
     }
-      });
-    });
   });
+});
