@@ -48,6 +48,7 @@ const app = express(); // create express app
 app.use(express.static(path.join(__dirname, config.site.path))); // set the static folder
 app.use(bodyParser.json()); // parse application/json
 app.use(cookieParser());
+//app.use(cors({origin:"http://localhost:3000" , credentials:true}))
 
 const oneDay = 1000 * 60 * 60 * 24;
 app.use(sessions({
@@ -119,6 +120,7 @@ app.post("/Search", async (req, res) => {
   //   console.log("invalidToken")
   // }
 
+  console.log(CSRFToken)
   //create a client to interact with the database
   const client = await pool.connect(); // create and connect a client to the database
   //try to get the data from the database
@@ -302,13 +304,12 @@ app.post("/login", async (req, res) => {
         //    });
         let tempSession = req.session
         tempSession.userid = req.body.username;
-        tempSession.token = 1234;
+        tempSession.token = csrfToken;
         userSession.set(username, tempSession);
         console.log(userSession.get(username));
 
         res.cookie("csrfToken", csrfToken)
         res.json({ success: true, csrfToken, message: 'Authed as ${req.body.username}' });
-        console.table(Array.from(SESSIONS));
         console.table(Array.from(CSRFToken));
         console.log("success");
       } else {
@@ -326,14 +327,22 @@ app.post("/login", async (req, res) => {
   }
 });
 
+app.get("/csrf",(req,res) =>{
+  console.log(req.session)
+  let session = req.session;
+  csrfToken = session.token;
+  res.json({ csrf: csrfToken });
+})
+
 app.get("/userId", (req, res) => {
   let session = req.session;
   sessionuserid = session.userid;
-  res.json({ userid: sessionuserid });
+  res.json({ userid: sessionuserid  });
 });
 
 app.post("/logout", (req, res) => {
   const sessionId = res.cookie("sessionId");
+  const csrfToken = res.cookie("csrfToken");
   res.clearCookie("sessionId");
 
   SESSIONS.delete(sessionId);
@@ -499,8 +508,8 @@ module.exports = {
 //     }
 
 // Function for add post
-app.post('/addpost', (req, res) => {
-  const { blogUserId, cleanBlogTitle, cleanBlogContent} = req.body;
+app.post('/addpost', async (req, res) => {
+  const { blogUserId, cleanBlogTitle, cleanBlogContent, newcsrfToken} = req.body;
 
   /* const pool = new pg.Pool(config.database);
   pool.connect((err, client, done) => {
@@ -524,15 +533,23 @@ app.post('/addpost', (req, res) => {
   } else {
     dbUserID = dbResult.rows[0]["id"];
   }
+  console.log(req.body.csrfToken)
+  console.log(CSRFToken[0].csrfToken)
+  if (newcsrfToken === CSRFToken[0].csrfToken) {
 
-  query = 'INSERT INTO posts (account_id, title, content) VALUES ($1, $2, $3) RETURNING id;';
-  values = [blogUserId, cleanBlogTitle, cleanBlogContent];
-  console.log(values);
-  client.query(query, values, (err, result) => {
-    if (err) {
-      console.error('Error querying database', err);
-      res.status(500).json({ success: false, message: 'Internal server error' });
-      return;
-    }
-  });
+
+    console.log("CSRF validated")
+    query = 'INSERT INTO posts (account_id, title, content) VALUES ($1, $2, $3) RETURNING id;';
+    values = [blogUserId, cleanBlogTitle, cleanBlogContent];
+    console.log(values);
+    client.query(query, values, (err, result) => {
+      if (err) {
+        console.error('Error querying database', err);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+        return;
+      }
+    });
+  } else {
+    console.log("invalidToken")
+  }
 });

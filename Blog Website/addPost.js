@@ -5,10 +5,13 @@ const postTitle = document.getElementById("postTitle");
 const  postContent = document.getElementById("postContent");
 // const userId = document.getElementById("userId");
 
+
 formBlogPost.addEventListener('submit', async (event) => {
     event.preventDefault();
     console.log("post submit attempt")
     let blogUserId = await fetchUserID();
+    let newcsrfToken = await fetchcsrfToken();
+    //let csrfToken = await fetchcsrfToken();
     const blogTitle = postTitle.value;
     const blogContent = postContent.value;
     // const responseDiv = document.getElementById('response');
@@ -23,33 +26,35 @@ formBlogPost.addEventListener('submit', async (event) => {
     modal.style.display = "block";
     console.log('response modal triggered')
     console.log('Response: ', window.location.href)
+    console.log("ID: ", blogUserId);
+    console.log("csrf", newcsrfToken);
+    
 
     const response = await fetch('/addpost', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ blogUserId, cleanBlogTitle, cleanBlogContent })
+        body: JSON.stringify({ blogUserId, cleanBlogTitle, cleanBlogContent,newcsrfToken})
     })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                console.log('Blog post success mk2')
-                // Redirect to the home page
-                window.location.href = '/posts.html';
-                //success modal
-                modal.style.display = "block"
-    
-            } else {
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log('Blog post success mk2')
+            // Redirect to the home page
+            window.location.href = "/posts.html";
+            modal.style.display = "block"
+            
+        } else {
                 // Display an error message
-                const error = document.querySelector('#error');
-                responseDiv.innerText = 'Unsuccessful';
-                error.textContent = data.message;
+            const error = document.querySelector('#error');
+            responseDiv.innerText = 'Unsuccessful';
+            error.textContent = data.message;
             }
         })
         .catch(error => console.error(error));
+    
 });
-
 
 async function fetchUserID() {
     var id;
@@ -60,7 +65,8 @@ async function fetchUserID() {
         })
         .then(function (data) {
             console.log("(fetchUserID) data.userid = "+ data.userid);
-            id = data.userid; // display the userid value in an element with id="userid"
+            id = data.userid;
+             // display the userid value in an element with id="userid"
         })
         .catch((error) => {
             console.log(error);
@@ -95,3 +101,26 @@ window.onclick = function(event) {
     modal.style.display = "none";
   }
 }
+async function fetchcsrfToken(){
+    var csrf;
+    const response = await fetch("/csrf", { method: "GET" })
+        .then((response) => {
+            return response.json(); // return the JSON of the response
+            console.log(response)
+        })
+        .then(function (data) {
+            csrf = data.csrf;
+            console.log("csrf ??" + csrf);
+        })
+        .catch((error) => {
+            console.log(error);
+            alert("An error getting csrf");
+        })
+        console.log("(fetchUserID) "+ csrf);
+    return csrf;
+
+}
+async function navToPost() {
+    window.location.href = "posts.html"
+}
+
