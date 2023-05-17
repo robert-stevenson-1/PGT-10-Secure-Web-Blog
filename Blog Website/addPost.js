@@ -15,10 +15,10 @@ formBlogPost.addEventListener('submit', async (event) => {
     // const responseDiv = document.getElementById('response');
     console.log("test2")
     console.log("Title: ", blogTitle)
-    const cleanBlogTitle = blogTitle.replace(/[^a-zA-Z0-9 \.\-?!"'&+]/g, '');
+    const cleanBlogTitle = blogTitle.replace(/[^a-zA-Z0-9 \.\-?!"'&+\n]/g, '');
     console.log("Sanitised Title: ", cleanBlogTitle)
     console.log("Body: ", blogContent)
-    const cleanBlogContent = blogContent.replace(/[^a-zA-Z0-9 \.\-?!"'&+]/g, '');
+    const cleanBlogContent = blogContent.replace(/[^a-zA-Z0-9 \.\-?!"'&+\n]/g, '');
     console.log("Sanitised Body: ", cleanBlogContent)
     console.log("ID: ", blogUserId)
     modal.style.display = "block";
