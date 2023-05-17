@@ -540,7 +540,7 @@ app.post('/addpost', async (req, res) => {
 
     console.log("CSRF validated")
     query = 'INSERT INTO posts (account_id, title, content) VALUES ($1, $2, $3) RETURNING id;';
-    values = [blogUserId, cleanBlogTitle, cleanBlogContent];
+    values = [dbUserID, cleanBlogTitle, cleanBlogContent];
     console.log(values);
     client.query(query, values, (err, result) => {
       if (err) {

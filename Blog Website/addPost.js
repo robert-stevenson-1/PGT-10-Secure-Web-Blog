@@ -46,7 +46,7 @@ formBlogPost.addEventListener('submit', async (event) => {
             modal.style.display = "block"
             
         } else {
-                // Display an error message
+            // Display an error message
             const error = document.querySelector('#error');
             responseDiv.innerText = 'Unsuccessful';
             error.textContent = data.message;
