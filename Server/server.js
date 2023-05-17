@@ -439,8 +439,7 @@ function generateVerificationCode() {
   //TODO: generate 6 digit verification code
   var minm = 000000;
   var maxm = 999999;
-  return 123456;
-  //return Math.floor(Math.random() * (maxm - minm + 1)) + minm;
+  return Math.floor(Math.random() * (maxm - minm + 1)) + minm;
 }
 
 function sendEmail(to_, subject_, message_) {
