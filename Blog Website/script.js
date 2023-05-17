@@ -112,6 +112,7 @@ async function searchPosts() {
             headers: {
                 "Content-Type": "application/json",
             },
+            body: JSON.stringify({csrfToken})
         })
             .then(function (response) {
                 //with the response....
@@ -595,6 +596,3 @@ function fetchUserID() {
 function navToNewPost() {
     window.location.href = "posts_new.html"
 }
-
-
-

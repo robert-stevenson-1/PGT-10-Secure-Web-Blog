@@ -5,10 +5,13 @@ const postTitle = document.getElementById("postTitle");
 const  postContent = document.getElementById("postContent");
 // const userId = document.getElementById("userId");
 
+
 formBlogPost.addEventListener('submit', async (event) => {
     event.preventDefault();
     console.log("test")
     let blogUserId = await fetchUserID();
+    let newcsrfToken = await fetchcsrfToken();
+    //let csrfToken = await fetchcsrfToken();
     const blogTitle = postTitle.value;
     const blogContent = postContent.value;
     const responseDiv = document.getElementById('response');
@@ -16,19 +19,22 @@ formBlogPost.addEventListener('submit', async (event) => {
     console.log("Title: ", blogTitle)
     console.log("Body: ", blogContent)
     console.log("ID: ", blogUserId);
+    console.log("csrf", newcsrfToken);
+    
 
     const response = await fetch('/addpost', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ blogUserId, blogTitle, blogContent })
+        body: JSON.stringify({ blogUserId, blogTitle, blogContent,newcsrfToken})
     })
     .then(response => response.json())
     .then(data => {
         if (data.success) {
                 // Redirect to the home page
             window.location.href = "/posts.html";
+            
     
         } else {
                 // Display an error message
@@ -38,8 +44,8 @@ formBlogPost.addEventListener('submit', async (event) => {
             }
         })
         .catch(error => console.error(error));
+    
 });
-
 
 async function fetchUserID() {
     var id;
@@ -50,7 +56,8 @@ async function fetchUserID() {
         })
         .then(function (data) {
             console.log("(fetchUserID) data.userid = "+ data.userid);
-            id = data.userid; // display the userid value in an element with id="userid"
+            id = data.userid;
+             // display the userid value in an element with id="userid"
         })
         .catch((error) => {
             console.log(error);
@@ -59,18 +66,26 @@ async function fetchUserID() {
     console.log("(fetchUserID) "+ id);
     return id;
 }
-// // Function to show successful blog post response
-// function postResponse() {
-//     divMain = document.getElementById('main')
+async function fetchcsrfToken(){
+    var csrf;
+    const response = await fetch("/csrf", { method: "GET" })
+        .then((response) => {
+            return response.json(); // return the JSON of the response
+            console.log(response)
+        })
+        .then(function (data) {
+            csrf = data.csrf;
+            console.log("csrf ??" + csrf);
+        })
+        .catch((error) => {
+            console.log(error);
+            alert("An error getting csrf");
+        })
+        console.log("(fetchUserID) "+ csrf);
+    return csrf;
 
-//     var divPostResponse = document.createElement('div')
-//     var h2PostReponse = document.createElement('h2')
-
-//     // arrange where insert element
-//     divPostResponse.appendChild(h2PostReponse)
-//     divMain.appendChild(divPostResponse)
-// }
-
-function navToPost() {
+}
+async function navToPost() {
     window.location.href = "posts.html"
 }
+
