@@ -107,16 +107,18 @@ app.post("/Search", async (req, res) => {
   params = [
     "%" + req.query.search + "%", // Wrap the parameter in % wildcards for pattern recognition in WHERE ... LIKE query
   ];
-  console.log(params);
+  // console.log(params);
 
   data = {};
-  console.log(CSRFToken)
-  if (req.cookies.csrfToken === CSRFToken[0].csrfToken) {
-    console.log("CSRF validated")
 
-  } else {
-    console.log("invalidToken")
-  }
+  // TODo: Ask Hasan about it
+  // console.log(CSRFToken)
+  // if (req.cookies.csrfToken === CSRFToken[0].csrfToken) {
+  //   console.log("CSRF validated")
+  // } else {
+  //   console.log("invalidToken")
+  // }
+
   //create a client to interact with the database
   const client = await pool.connect(); // create and connect a client to the database
   //try to get the data from the database
@@ -124,7 +126,7 @@ app.post("/Search", async (req, res) => {
     // Create send the query with db with the parameter values and read request from the database
     dbResult = await client.query(dbQueries.SEARCH_POSTS, params);
     // console.log(data)
-    console.log(dbResult.rows);
+    // console.log(dbResult.rows);
 
     //create a JSON object for posts info to send to the frontend as a response for processing and displaying
     const postToAdd = {

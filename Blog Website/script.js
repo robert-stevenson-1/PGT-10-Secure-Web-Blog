@@ -6,12 +6,14 @@ const inputSearch = document.getElementById("searchBar");
 // const btnSearch = document.getElementById('searchBtn');
 if (inputSearch != null) {
     // when ever the search bar is typed in then run event
-    inputSearch.addEventListener("keyup", function (event) {
+    inputSearch.addEventListener("keyup", async function (event) {
         event.preventDefault();
         if (event.key === "Enter") {
             console.log(location.href);
-            let boolSearchRedirect = searchPosts();
+            let boolSearchRedirect = await searchPosts();
+            console.log(boolSearchRedirect);
             if (boolSearchRedirect == true) {
+                console.log("Redirecting to search results");
                 // redirect to search page
                 window.location.href = "/Search.html";
             }
@@ -94,8 +96,6 @@ function processPosts(posts) {
 }
 
 async function searchPosts() {
-    console.log(inputSearch);
-
     //data to send
     let val = inputSearch.value; //check the regex
     // check for presence of value and is larger than 0
@@ -107,7 +107,7 @@ async function searchPosts() {
         let boolSearchRedirect = false;
 
         //written with the aid of: https://www.digitalocean.com/community/tutorials/use-expressjs-to-get-url-and-post-parameters
-        fetch(`/Search?search=${val}`, {
+        const response = await fetch(`/Search?search=${val}`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -120,6 +120,8 @@ async function searchPosts() {
                 return response.json(); // return the JSON of the response
             })
             .then(function (data) {
+                console.log(data);
+
                 //check if the are successful, and if true then carry on, else do nothing
                 if (data.success) {
                     // store the search results in session storage so that we can use it in the search.html page
@@ -131,10 +133,10 @@ async function searchPosts() {
                     // signal we are ok to redirect to the search result page
                     boolSearchRedirect = true;
                 }
-                return false;
             })
             .catch((error) => console.error(error)); // catch any error and print it out
-
+        
+        console.log(boolSearchRedirect ? "redirecting true" : "redirecting false");
         return boolSearchRedirect;
         // if (boolSearchRedirect == true){
         //     // redirect to search page
@@ -572,8 +574,8 @@ function logout() {
         });
 }
 
-function fetchUserID() {
-    fetch("/userId", { method: "GET" })
+async function fetchUserID() {
+    const response = await fetch("/userId", { method: "GET" })
         .then((response) => {
             return response.json(); // return the JSON of the response
         })
@@ -583,7 +585,7 @@ function fetchUserID() {
         })
         .catch((error) => {
             console.log(error);
-            alert("An error gettiıng userİD");
+            alert("An error getting userİD");
         });
 
 }
