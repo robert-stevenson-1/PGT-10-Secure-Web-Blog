@@ -15,7 +15,11 @@ formBlogPost.addEventListener('submit', async (event) => {
     // const responseDiv = document.getElementById('response');
     console.log("test2")
     console.log("Title: ", blogTitle)
+    const cleanBlogTitle = blogTitle.replace(/[^a-zA-Z0-9 \.\-?!"'&+]/g, '');
+    console.log("Sanitised Title: ", cleanBlogTitle)
     console.log("Body: ", blogContent)
+    const cleanBlogContent = blogContent.replace(/[^a-zA-Z0-9 \.\-?!"'&+]/g, '');
+    console.log("Sanitised Body: ", cleanBlogContent)
     console.log("ID: ", blogUserId)
     modal.style.display = "block";
     console.log('response modal triggered')
@@ -26,7 +30,7 @@ formBlogPost.addEventListener('submit', async (event) => {
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ blogUserId, blogTitle, blogContent })
+        body: JSON.stringify({ blogUserId, cleanBlogTitle, cleanBlogContent })
     })
         .then(response => response.json())
         .then(data => {

@@ -497,7 +497,7 @@ module.exports = {
 
 // Function for add post
 app.post('/addpost', (req, res) => {
-  const { blogUserId, blogTitle, blogContent} = req.body;
+  const { blogUserId, cleanBlogTitle, cleanBlogContent} = req.body;
 
   const pool = new pg.Pool(config.database);
   pool.connect((err, client, done) => {
@@ -507,7 +507,7 @@ app.post('/addpost', (req, res) => {
           return;
       }
   const query = 'INSERT INTO posts (account_id, title, content) VALUES ($1, $2, $3) RETURNING id;';
-  const values = [blogUserId, blogTitle, blogContent];
+  const values = [blogUserId, cleanBlogTitle, cleanBlogContent];
   console.log(values);
   client.query(query, values, (err, result) => {
     done(); // Release the client back to the pool
