@@ -21,7 +21,7 @@ describe("Test we can check that a user that is NOT in the db is rejected from l
 // TODO: Test we can retrieve the posts from the database through the website
 describe("Test the retrieval of posts from the database through the website", function(){
     //posts = server.getPostsJSON();
-    api_url =  "/getPosts" // Web GET request url
+    let api_url =  "/getPosts" // Web GET request url
 
     // 'done' callback need to do the test without the test passing before the assertion is checked, 
     // as assertions are ran asynchronously. Source: https://www.chaijs.com/plugins/chai-http/ 
@@ -51,11 +51,21 @@ describe("Test we can retrieve a single, specific post from the database", funct
 });
 
 // TODO: Test we can search the database and get the result
-describe("Test we can search the database and get the result", function(){
-
+describe("Test we can search the database for post that contain a word and get the results", function(){
+    let api_url = "/Search";
+    it("Check for posts that contain the word 'is'", function(done){
+        chai.request(server.app)
+            .post(api_url+"?search=is")
+            .end(function(err, res){
+                expect(res, "Fail: Response status not 200").to.have.status(200);                
+                expect(res.body, "Fail: No \'Posts\' property in json from a search of 'is'").have.property("posts");
+                expect(res.body, "Fail: No Post(s) data found in response from a search of 'is'").have.property("posts").with.length.greaterThanOrEqual(1);
+                done();
+            });
+    });
 });
 
 // TODO: Test blocking/preventing of sql injection
-describe("Test blocking/preventing of sql injection", function(){
+describe("Test blocking/preventing of sql injection in the search bar", function(){
 
 });
