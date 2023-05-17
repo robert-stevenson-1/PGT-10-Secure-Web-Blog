@@ -18,7 +18,7 @@ describe("Test we can check that a user that is NOT in the db is rejected from l
 
 });
 
-// TODO: Test we can retrieve the posts from the database through the website
+// Test we can retrieve the posts from the database through the website
 describe("Test the retrieval of posts from the database through the website", function(){
     //posts = server.getPostsJSON();
     let api_url =  "/getPosts" // Web GET request url
@@ -50,16 +50,29 @@ describe("Test we can retrieve a single, specific post from the database", funct
 
 });
 
-// TODO: Test we can search the database and get the result
+// Test we can search the database and get the result
 describe("Test we can search the database for post that contain a word and get the results", function(){
     let api_url = "/Search";
     it("Check for posts that contain the word 'is'", function(done){
         chai.request(server.app)
-            .post(api_url+"?search=is")
+            .post(api_url)
+            .query({search : 'is'})
             .end(function(err, res){
                 expect(res, "Fail: Response status not 200").to.have.status(200);                
                 expect(res.body, "Fail: No \'Posts\' property in json from a search of 'is'").have.property("posts");
                 expect(res.body, "Fail: No Post(s) data found in response from a search of 'is'").have.property("posts").with.length.greaterThanOrEqual(1);
+                done();
+            });
+    });
+
+    it("Check for posts that contain the word 'passion'", function(done){
+        chai.request(server.app)
+            .post(api_url)
+            .query({search : 'passion'})
+            .end(function(err, res){
+                expect(res, "Fail: Response status not 200").to.have.status(200);                
+                expect(res.body, "Fail: No \'Posts\' property in json from a search of 'passion'").have.property("posts");
+                expect(res.body, "Fail: No Post(s) data found in response from a search of 'passion'").have.property("posts").with.length.greaterThanOrEqual(1);
                 done();
             });
     });
